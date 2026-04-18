@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
@@ -6,6 +7,7 @@ import {
   Package, TrendingUp, ShoppingCart, AlertTriangle,
   ArrowUpRight, ArrowDownRight, Users, ChevronRight, RefreshCcw
 } from "lucide-react";
+import { CardDetailModal } from "../components/CardDetailModal";
 
 const salesData = [
   { month: "Jan", penjualan: 42000000, target: 40000000 },
@@ -64,6 +66,7 @@ const statusLabels: Record<string, string> = {
 
 export function Dashboard() {
   const navigate = useNavigate();
+  const [selectedCard, setSelectedCard] = useState<string | null>(null);
 
   const summaryCards = [
     {
@@ -125,7 +128,11 @@ export function Dashboard() {
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
         {summaryCards.map((card) => (
-          <div key={card.title} className={`bg-white rounded-xl border ${card.border} p-5 hover:shadow-md transition-shadow`}>
+          <div
+            key={card.title}
+            onClick={() => setSelectedCard(card.title)}
+            className={`bg-white rounded-xl border ${card.border} p-5 hover:shadow-md transition-shadow cursor-pointer hover:border-gray-300`}
+          >
             <div className="flex items-start justify-between mb-4">
               <div className={`w-11 h-11 ${card.bg} rounded-xl flex items-center justify-center`}>
                 {card.icon}
@@ -313,6 +320,13 @@ export function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Card Detail Modal */}
+      <CardDetailModal
+        isOpen={selectedCard !== null}
+        title={selectedCard}
+        onClose={() => setSelectedCard(null)}
+      />
     </div>
   );
 }
