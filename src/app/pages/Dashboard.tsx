@@ -23,25 +23,25 @@ const salesData = [
 ];
 
 const stockData = [
-  { name: "Elektronik", stok: 450, keluar: 120 },
-  { name: "Pakaian", stok: 680, keluar: 230 },
-  { name: "Makanan", stok: 320, keluar: 180 },
-  { name: "Furniture", stok: 150, keluar: 45 },
-  { name: "Kosmetik", stok: 280, keluar: 95 },
+  { name: "Ayam Potong", stok: 450, keluar: 120 },
+  { name: "Ayam Hidup", stok: 680, keluar: 230 },
+  { name: "Telur", stok: 320, keluar: 180 },
+  { name: "Hasil Olahan", stok: 150, keluar: 45 },
+  { name: "Ayam Bibit", stok: 280, keluar: 95 },
 ];
 
 const recentTransactions = [
-  { id: "TRX-001", product: "iPhone 15 Pro", category: "Elektronik", qty: 5, amount: 74999000, status: "completed", date: "18 Apr 2026" },
-  { id: "TRX-002", product: "Kemeja Oxford", category: "Pakaian", qty: 12, amount: 1440000, status: "processing", date: "18 Apr 2026" },
-  { id: "TRX-003", product: "Laptop ASUS ROG", category: "Elektronik", qty: 2, amount: 34000000, status: "completed", date: "17 Apr 2026" },
-  { id: "TRX-004", product: "Sofa L-Shape", category: "Furniture", qty: 1, amount: 8500000, status: "pending", date: "17 Apr 2026" },
-  { id: "TRX-005", product: "Serum Vitamin C", category: "Kosmetik", qty: 30, amount: 4500000, status: "completed", date: "16 Apr 2026" },
+  { id: "TRX-001", product: "Ayam Broiler Siap Potong", category: "Ayam Potong", qty: 50, amount: 1750000, status: "completed", date: "18 Apr 2026" },
+  { id: "TRX-002", product: "Ayam Kampung Premium", category: "Ayam Hidup", qty: 25, amount: 1625000, status: "processing", date: "18 Apr 2026" },
+  { id: "TRX-003", product: "Daging Ayam Fillet", category: "Hasil Olahan", qty: 10, amount: 750000, status: "completed", date: "17 Apr 2026" },
+  { id: "TRX-004", product: "Telur Ayam Segar", category: "Telur", qty: 5, amount: 225000, status: "pending", date: "17 Apr 2026" },
+  { id: "TRX-005", product: "Ayam Goreng Siap Jual", category: "Hasil Olahan", qty: 30, amount: 1350000, status: "completed", date: "16 Apr 2026" },
 ];
 
 const lowStockItems = [
-  { name: "MacBook Air M3", stock: 3, min: 10, category: "Elektronik" },
-  { name: "Sofa Minimalis", stock: 2, min: 5, category: "Furniture" },
-  { name: "Parfum Premium", stock: 8, min: 20, category: "Kosmetik" },
+  { name: "Telur Ayam Segar (per karton)", stock: 3, min: 10, category: "Telur" },
+  { name: "Ayam Broiler Bibit", stock: 2, min: 5, category: "Ayam Bibit" },
+  { name: "Telur Omega 3 (per karton)", stock: 8, min: 20, category: "Telur" },
 ];
 
 const formatCurrency = (v: number) => {

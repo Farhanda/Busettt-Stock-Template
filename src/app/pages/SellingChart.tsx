@@ -22,6 +22,19 @@ const salesMonthly = [
   { month: "Des", penjualan: 95000000, biaya: 55000000, profit: 40000000, transaksi: 340 },
 ];
 
+const salesWeekly = [
+  { week: "W1", penjualan: 18200000, biaya: 12100000, profit: 6100000, transaksi: 62 },
+  { week: "W2", penjualan: 22100000, biaya: 14600000, profit: 7500000, transaksi: 75 },
+  { week: "W3", penjualan: 19800000, biaya: 13200000, profit: 6600000, transaksi: 68 },
+  { week: "W4", penjualan: 25900000, biaya: 17150000, profit: 8750000, transaksi: 88 },
+];
+
+const salesYearly = [
+  { year: "2024", penjualan: 680000000, biaya: 408000000, profit: 272000000, transaksi: 2840 },
+  { year: "2025", penjualan: 745000000, biaya: 447000000, profit: 298000000, transaksi: 3105 },
+  { year: "2026", penjualan: 780000000, biaya: 468000000, profit: 312000000, transaksi: 2765 },
+];
+
 const salesByChannel = [
   { name: "Toko Fisik", value: 35, color: "#1E3A8A" },
   { name: "Marketplace", value: 42, color: "#3B82F6" },
@@ -30,11 +43,11 @@ const salesByChannel = [
 ];
 
 const topProducts = [
-  { name: "iPhone 15 Pro", revenue: 74995000, units: 5, category: "Elektronik" },
-  { name: "Laptop ASUS ROG", revenue: 68000000, units: 2, category: "Elektronik" },
-  { name: "Samsung S24 Ultra", revenue: 53997000, units: 3, category: "Elektronik" },
-  { name: "Sofa L-Shape", revenue: 25500000, units: 3, category: "Furniture" },
-  { name: "AirPods Pro", revenue: 16800000, units: 4, category: "Elektronik" },
+  { name: "Ayam Broiler Siap Potong", revenue: 5250000, units: 150, category: "Ayam Potong" },
+  { name: "Ayam Kampung Premium", revenue: 1625000, units: 25, category: "Ayam Hidup" },
+  { name: "Daging Ayam Fillet", revenue: 750000, units: 10, category: "Hasil Olahan" },
+  { name: "Telur Ayam Segar (per karton)", revenue: 225000, units: 5, category: "Telur" },
+  { name: "Ayam Goreng Siap Jual", revenue: 1350000, units: 30, category: "Hasil Olahan" },
 ];
 
 const performanceData = [
@@ -56,10 +69,32 @@ const dailyThisWeek = [
   { day: "Minggu", penjualan: 9800000, target: 9000000 },
 ];
 
+const weeklyPerMonth = [
+  { week: "W1", penjualan: 8500000, target: 9000000 },
+  { week: "W2", penjualan: 12200000, target: 9000000 },
+  { week: "W3", penjualan: 7800000, target: 9000000 },
+  { week: "W4", penjualan: 15600000, target: 9000000 },
+];
+
+const monthlyPerYear = [
+  { month: "Jan", penjualan: 42000000, target: 45000000 },
+  { month: "Feb", penjualan: 38500000, target: 45000000 },
+  { month: "Mar", penjualan: 55000000, target: 45000000 },
+  { month: "Apr", penjualan: 47000000, target: 45000000 },
+  { month: "Mei", penjualan: 62000000, target: 45000000 },
+  { month: "Jun", penjualan: 58000000, target: 45000000 },
+  { month: "Jul", penjualan: 72000000, target: 45000000 },
+  { month: "Agu", penjualan: 68000000, target: 45000000 },
+  { month: "Sep", penjualan: 75000000, target: 45000000 },
+  { month: "Okt", penjualan: 80000000, target: 45000000 },
+  { month: "Nov", penjualan: 88000000, target: 45000000 },
+  { month: "Des", penjualan: 95000000, target: 45000000 },
+];
+
 const formatM = (v: number) => `Rp ${(v / 1000000).toFixed(1)}M`;
 
 export function SellingChart() {
-  const [period, setPeriod] = useState("yearly");
+  const [selectedPeriod, setSelectedPeriod] = useState("monthly");
 
   const summaryCards = [
     { label: "Total Revenue (YTD)", value: "Rp 780M", icon: <DollarSign size={20} className="text-blue-600" />, bg: "bg-blue-50", change: "+18.2%", sub: "vs tahun lalu" },
@@ -85,9 +120,9 @@ export function SellingChart() {
             ].map((p) => (
               <button
                 key={p.key}
-                onClick={() => setPeriod(p.key)}
-                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${period === p.key ? "text-white shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
-                style={period === p.key ? { background: "#1E3A8A" } : {}}
+                onClick={() => setSelectedPeriod(p.key)}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${selectedPeriod === p.key ? "text-white shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                style={selectedPeriod === p.key ? { background: "#1E3A8A" } : {}}
               >
                 {p.label}
               </button>
@@ -123,11 +158,13 @@ export function SellingChart() {
           <div className="flex items-center justify-between mb-5">
             <div>
               <h3 className="text-gray-900">Revenue & Profit 2026</h3>
-              <p className="text-sm text-gray-500 mt-0.5">Tren penjualan dan keuntungan bersih</p>
+              <p className="text-sm text-gray-500 mt-0.5">
+                {selectedPeriod === "weekly" ? "Tren penjualan & keuntungan mingguan" : selectedPeriod === "monthly" ? "Tren penjualan dan keuntungan bersih" : "Tren penjualan tahunan"}
+              </p>
             </div>
           </div>
           <ResponsiveContainer width="100%" height={260}>
-            <AreaChart data={salesMonthly}>
+            <AreaChart data={selectedPeriod === "weekly" ? salesWeekly : selectedPeriod === "monthly" ? salesMonthly : salesYearly}>
               <defs>
                 <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.15} />
@@ -139,7 +176,7 @@ export function SellingChart() {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+              <XAxis dataKey={selectedPeriod === "weekly" ? "week" : selectedPeriod === "monthly" ? "month" : "year"} tick={{ fontSize: 12, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
               <YAxis tickFormatter={(v) => `${(v / 1000000).toFixed(0)}M`} tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
               <Tooltip formatter={(v: number) => [formatM(v), ""]} />
               <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "12px" }} />
@@ -180,19 +217,29 @@ export function SellingChart() {
       </div>
 
       {/* Second Row */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+      <div className="bg-white rounded-xl border border-gray-100 p-5">
         {/* Daily This Week */}
         <div className="xl:col-span-2 bg-white rounded-xl border border-gray-100 p-5">
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h3 className="text-gray-900">Penjualan Harian Minggu Ini</h3>
-              <p className="text-sm text-gray-500 mt-0.5">Aktual vs Target harian</p>
+              <h3 className="text-gray-900">
+                {selectedPeriod === "weekly" ? "Penjualan Harian Minggu Ini" : selectedPeriod === "monthly" ? "Penjualan Per Minggu Bulan Ini" : "Penjualan Per Bulan Tahun Ini"}
+              </h3>
+              <p className="text-sm text-gray-500 mt-0.5">Aktual vs Target</p>
             </div>
           </div>
           <ResponsiveContainer width="100%" height={230}>
-            <BarChart data={dailyThisWeek} barGap={6}>
+            <BarChart 
+              data={selectedPeriod === "weekly" ? dailyThisWeek : selectedPeriod === "monthly" ? weeklyPerMonth : monthlyPerYear} 
+              barGap={6}
+            >
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="day" tick={{ fontSize: 12, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+              <XAxis 
+                dataKey={selectedPeriod === "weekly" ? "day" : selectedPeriod === "monthly" ? "week" : "month"} 
+                tick={{ fontSize: 12, fill: "#94a3b8" }} 
+                axisLine={false} 
+                tickLine={false} 
+              />
               <YAxis tickFormatter={(v) => `${(v / 1000000).toFixed(0)}M`} tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
               <Tooltip formatter={(v: number) => [formatM(v), ""]} />
               <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "12px" }} />
@@ -202,21 +249,6 @@ export function SellingChart() {
           </ResponsiveContainer>
         </div>
 
-        {/* Performance Radar */}
-        <div className="bg-white rounded-xl border border-gray-100 p-5">
-          <div className="mb-5">
-            <h3 className="text-gray-900">Skor Performa</h3>
-            <p className="text-sm text-gray-500 mt-0.5">Analisis 6 dimensi kunci</p>
-          </div>
-          <ResponsiveContainer width="100%" height={230}>
-            <RadarChart data={performanceData}>
-              <PolarGrid stroke="#e5e7eb" />
-              <PolarAngleAxis dataKey="subject" tick={{ fontSize: 9, fill: "#6b7280" }} />
-              <Radar name="Skor" dataKey="A" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.25} strokeWidth={2} />
-              <Tooltip />
-            </RadarChart>
-          </ResponsiveContainer>
-        </div>
       </div>
 
       {/* Top Products Table */}

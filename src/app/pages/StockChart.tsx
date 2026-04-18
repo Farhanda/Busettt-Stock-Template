@@ -22,20 +22,20 @@ const monthlyStock = [
 ];
 
 const categoryStock = [
-  { name: "Elektronik", value: 850, color: "#1E3A8A" },
-  { name: "Pakaian", value: 1240, color: "#3B82F6" },
-  { name: "Furniture", value: 320, color: "#60A5FA" },
-  { name: "Kosmetik", value: 680, color: "#93C5FD" },
-  { name: "Makanan", value: 710, color: "#BFDBFE" },
+  { name: "Ayam Potong", value: 450, color: "#1E3A8A" },
+  { name: "Ayam Hidup", value: 680, color: "#3B82F6" },
+  { name: "Telur", value: 320, color: "#60A5FA" },
+  { name: "Hasil Olahan", value: 150, color: "#93C5FD" },
+  { name: "Ayam Bibit", value: 280, color: "#BFDBFE" },
 ];
 
 const topMoving = [
-  { name: "iPhone 15 Pro", keluar: 180, category: "Elektronik" },
-  { name: "Kemeja Oxford", keluar: 165, category: "Pakaian" },
-  { name: "Serum Vit.C", keluar: 142, category: "Kosmetik" },
-  { name: "Samsung S24", keluar: 128, category: "Elektronik" },
-  { name: "Celana Jeans", keluar: 115, category: "Pakaian" },
-  { name: "AirPods Pro", keluar: 98, category: "Elektronik" },
+  { name: "Ayam Broiler Siap Potong", keluar: 180, category: "Ayam Potong" },
+  { name: "Ayam Kampung Premium", keluar: 165, category: "Ayam Hidup" },
+  { name: "Telur Ayam Segar", keluar: 142, category: "Telur" },
+  { name: "Daging Ayam Fillet", keluar: 128, category: "Hasil Olahan" },
+  { name: "Ayam Jawa Super", keluar: 115, category: "Ayam Hidup" },
+  { name: "Ayam Goreng Siap Jual", keluar: 98, category: "Hasil Olahan" },
 ];
 
 const weeklyTrend = [

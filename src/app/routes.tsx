@@ -5,6 +5,8 @@ import { Register } from "./pages/Register";
 import { Dashboard } from "./pages/Dashboard";
 import { StockTable } from "./pages/StockTable";
 import { StockDetail } from "./pages/StockDetail";
+import { AddStock } from "./pages/AddStock";
+import { EditStock } from "./pages/EditStock";
 import { StockChart } from "./pages/StockChart";
 import { SellingChart } from "./pages/SellingChart";
 import { ReportTable } from "./pages/ReportTable";
@@ -28,6 +30,8 @@ export const router = createBrowserRouter([
       { path: "dashboard", Component: Dashboard },
       { path: "stock/table", Component: StockTable },
       { path: "stock/detail", Component: StockDetail },
+      { path: "stock/add", Component: AddStock },
+      { path: "stock/edit", Component: EditStock },
       { path: "stock/chart", Component: StockChart },
       { path: "selling-chart", Component: SellingChart },
       { path: "report/table", Component: ReportTable },

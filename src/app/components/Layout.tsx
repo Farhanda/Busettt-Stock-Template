@@ -19,6 +19,12 @@ import {
   Table2,
   Eye,
   LineChart,
+  Volume2,
+  Lock,
+  Eye as EyeIcon,
+  HelpCircle,
+  Moon,
+  Sun,
 } from "lucide-react";
 
 interface NavItem {
@@ -72,6 +78,9 @@ export function Layout() {
   });
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
 
   const toggleMenu = (label: string) => {
     setOpenMenus((prev) => ({ ...prev, [label]: !prev[label] }));
@@ -235,13 +244,128 @@ export function Layout() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <button className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors">
-              <Bell size={18} className="text-gray-500" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full" style={{ background: "#3B82F6" }} />
-            </button>
-            <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-              <Settings size={18} className="text-gray-500" />
-            </button>
+            {/* Notification Button */}
+            <div className="relative">
+              <button 
+                onClick={() => {
+                  setNotificationOpen(!notificationOpen);
+                  setSettingsOpen(false);
+                }}
+                className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                <Bell size={18} className="text-gray-500" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full" style={{ background: "#3B82F6" }} />
+              </button>
+              
+              {/* Notification Dropdown */}
+              {notificationOpen && (
+                <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-100 z-50 overflow-hidden">
+                  <div className="p-4 border-b border-gray-100 bg-gray-50">
+                    <h3 className="font-semibold text-gray-900 text-sm">Notifikasi</h3>
+                  </div>
+                  <div className="max-h-96 overflow-y-auto">
+                    {[
+                      { id: 1, title: "Stok Menipis", message: "Ayam Broiler Siap Potong stok mencapai minimum", time: "5 menit lalu", icon: "📦", unread: true },
+                      { id: 2, title: "Pemesanan Baru", message: "Ada 8 pemesanan ayam baru dari toko retail", time: "15 menit lalu", icon: "🛒", unread: true },
+                      { id: 3, title: "Penerimaan Barang", message: "Pengiriman ayam dari PT. Peternakan Maju telah tiba", time: "1 jam lalu", icon: "✅", unread: false },
+                      { id: 4, title: "Laporan Bulanan", message: "Laporan penjualan ayam bulan April sudah siap", time: "2 jam lalu", icon: "📊", unread: false },
+                      { id: 5, title: "Update Sistem", message: "Sistem akan maintenance malam ini", time: "3 jam lalu", icon: "🔄", unread: false },
+                    ].map((notif) => (
+                      <div key={notif.id} className={`px-4 py-3 border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition-colors ${notif.unread ? "bg-blue-50/50" : ""}`}>
+                        <div className="flex gap-3">
+                          <div className="text-xl flex-shrink-0">{notif.icon}</div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2">
+                              <h4 className="font-medium text-gray-900 text-sm">{notif.title}</h4>
+                              {notif.unread && <div className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style={{ background: "#3B82F6" }} />}
+                            </div>
+                            <p className="text-xs text-gray-600 mt-0.5 line-clamp-2">{notif.message}</p>
+                            <p className="text-xs text-gray-400 mt-1">{notif.time}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="px-4 py-3 border-t border-gray-100 bg-gray-50 text-center">
+                    <button className="text-xs font-medium text-blue-600 hover:text-blue-700">
+                      Lihat Semua Notifikasi
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Settings Button */}
+            <div className="relative">
+              <button 
+                onClick={() => {
+                  setSettingsOpen(!settingsOpen);
+                  setNotificationOpen(false);
+                }}
+                className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                <Settings size={18} className="text-gray-500" />
+              </button>
+
+              {/* Settings Dropdown */}
+              {settingsOpen && (
+                <div className="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-lg border border-gray-100 z-50 overflow-hidden">
+                  <div className="p-4 border-b border-gray-100 bg-gray-50">
+                    <h3 className="font-semibold text-gray-900 text-sm">Pengaturan</h3>
+                  </div>
+                  <div className="p-3 space-y-2">
+                    {/* Dark Mode Toggle */}
+                    <button className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-gray-50 transition-colors text-left">
+                      <div className="flex items-center gap-3">
+                        {darkMode ? <Moon size={16} className="text-gray-600" /> : <Sun size={16} className="text-gray-600" />}
+                        <span className="text-sm text-gray-700 font-medium">Mode Gelap</span>
+                      </div>
+                      <div 
+                        onClick={() => setDarkMode(!darkMode)}
+                        className={`w-10 h-6 rounded-full transition-colors flex items-center px-1 cursor-pointer ${darkMode ? "bg-blue-600" : "bg-gray-300"}`}>
+                        <div className={`w-5 h-5 bg-white rounded-full transition-transform ${darkMode ? "translate-x-4" : ""}`} />
+                      </div>
+                    </button>
+
+                    {/* Sound Notification */}
+                    <button className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-gray-50 transition-colors text-left">
+                      <div className="flex items-center gap-3">
+                        <Volume2 size={16} className="text-gray-600" />
+                        <span className="text-sm text-gray-700 font-medium">Notifikasi Suara</span>
+                      </div>
+                      <div className="w-10 h-6 rounded-full bg-blue-600 transition-colors flex items-center px-1 cursor-pointer">
+                        <div className="w-5 h-5 bg-white rounded-full transition-transform translate-x-4" />
+                      </div>
+                    </button>
+
+                    {/* Privacy */}
+                    <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 transition-colors text-left">
+                      <Lock size={16} className="text-gray-600" />
+                      <span className="text-sm text-gray-700 font-medium">Privasi & Keamanan</span>
+                      <ChevronRight size={14} className="text-gray-400 ml-auto" />
+                    </button>
+
+                    {/* Visibility */}
+                    <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 transition-colors text-left">
+                      <EyeIcon size={16} className="text-gray-600" />
+                      <span className="text-sm text-gray-700 font-medium">Preferensi Tampilan</span>
+                      <ChevronRight size={14} className="text-gray-400 ml-auto" />
+                    </button>
+
+                    {/* Help */}
+                    <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 transition-colors text-left">
+                      <HelpCircle size={16} className="text-gray-600" />
+                      <span className="text-sm text-gray-700 font-medium">Bantuan & Dukungan</span>
+                      <ChevronRight size={14} className="text-gray-400 ml-auto" />
+                    </button>
+                  </div>
+                  <div className="px-3 py-3 border-t border-gray-100 bg-gray-50">
+                    <button className="w-full text-xs font-medium text-gray-600 hover:text-gray-900 py-2">
+                      Pengaturan Lanjutan
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="flex items-center gap-2.5 pl-3 border-l border-gray-200">
               <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: "#1E3A8A" }}>
                 AD

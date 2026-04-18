@@ -18,19 +18,19 @@ const weeklyBreakdown = [
 ];
 
 const categoryBreakdown = [
-  { name: "Elektronik", value: 58000000, color: "#1E3A8A" },
-  { name: "Pakaian", value: 15000000, color: "#3B82F6" },
-  { name: "Furniture", value: 12000000, color: "#60A5FA" },
-  { name: "Kosmetik", value: 10000000, color: "#93C5FD" },
+  { name: "Ayam Potong", value: 5250000, color: "#1E3A8A" },
+  { name: "Ayam Hidup", value: 1625000, color: "#3B82F6" },
+  { name: "Telur", value: 225000, color: "#60A5FA" },
+  { name: "Hasil Olahan", value: 2100000, color: "#93C5FD" },
 ];
 
 const topItems = [
-  { rank: 1, name: "iPhone 15 Pro 256GB", qty: 28, revenue: 41997200, category: "Elektronik" },
-  { rank: 2, name: "Samsung Galaxy S24 Ultra", qty: 22, revenue: 39597800, category: "Elektronik" },
-  { rank: 3, name: "MacBook Air M3", qty: 8, revenue: 18000000, category: "Elektronik" },
-  { rank: 4, name: "Sofa L-Shape Minimalis", qty: 15, revenue: 12750000, category: "Furniture" },
-  { rank: 5, name: "AirPods Pro 2nd Gen", qty: 32, revenue: 13440000, category: "Elektronik" },
-  { rank: 6, name: "Kemeja Oxford Premium", qty: 85, revenue: 10200000, category: "Pakaian" },
+  { rank: 1, name: "Ayam Broiler Siap Potong", qty: 450, revenue: 15750000, category: "Ayam Potong" },
+  { rank: 2, name: "Ayam Kampung Premium", qty: 220, revenue: 14300000, category: "Ayam Hidup" },
+  { rank: 3, name: "Daging Ayam Fillet", qty: 80, revenue: 6000000, category: "Hasil Olahan" },
+  { rank: 4, name: "Telur Ayam Segar (per karton)", qty: 45, revenue: 2025000, category: "Telur" },
+  { rank: 5, name: "Ayam Goreng Siap Jual", qty: 120, revenue: 5400000, category: "Hasil Olahan" },
+  { rank: 6, name: "Ayam Jawa Super", qty: 180, revenue: 9900000, category: "Ayam Hidup" },
 ];
 
 export function ReportDetail() {

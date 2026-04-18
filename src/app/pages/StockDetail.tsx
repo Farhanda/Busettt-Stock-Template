@@ -9,24 +9,24 @@ import {
 } from "recharts";
 
 const stockHistory = [
-  { date: "01 Apr", in: 50, out: 15, balance: 88 },
-  { date: "03 Apr", in: 0, out: 8, balance: 80 },
-  { date: "05 Apr", in: 100, out: 22, balance: 158 },
-  { date: "08 Apr", in: 0, out: 30, balance: 128 },
-  { date: "10 Apr", in: 0, out: 18, balance: 110 },
-  { date: "12 Apr", in: 0, out: 25, balance: 85 },
-  { date: "14 Apr", in: 0, out: 20, balance: 65 },
-  { date: "16 Apr", in: 0, out: 15, balance: 50 },
-  { date: "18 Apr", in: 0, out: 5, balance: 45 },
+  { date: "01 Apr", in: 100, out: 25, balance: 108 },
+  { date: "03 Apr", in: 0, out: 18, balance: 90 },
+  { date: "05 Apr", in: 150, out: 32, balance: 208 },
+  { date: "08 Apr", in: 0, out: 40, balance: 168 },
+  { date: "10 Apr", in: 0, out: 28, balance: 140 },
+  { date: "12 Apr", in: 0, out: 30, balance: 110 },
+  { date: "14 Apr", in: 0, out: 24, balance: 86 },
+  { date: "16 Apr", in: 0, out: 20, balance: 66 },
+  { date: "18 Apr", in: 0, out: 16, balance: 150 },
 ];
 
 const activityLog = [
-  { id: 1, type: "in", qty: 100, user: "Budi Santoso", date: "05 Apr 2026, 09:30", note: "Restock dari supplier Apple" },
-  { id: 2, type: "out", qty: 30, user: "Sistem (POS)", date: "08 Apr 2026, 11:15", note: "Penjualan online" },
-  { id: 3, type: "out", qty: 18, user: "Sistem (POS)", date: "10 Apr 2026, 14:20", note: "Penjualan toko" },
-  { id: 4, type: "out", qty: 25, user: "Dewi Rahayu", date: "12 Apr 2026, 10:00", note: "Pengiriman ke cabang Surabaya" },
-  { id: 5, type: "out", qty: 20, user: "Sistem (POS)", date: "14 Apr 2026, 16:45", note: "Penjualan online" },
-  { id: 6, type: "out", qty: 15, user: "Sistem (POS)", date: "16 Apr 2026, 13:30", note: "Penjualan toko" },
+  { id: 1, type: "in", qty: 150, user: "Budi Santoso", date: "18 Apr 2026, 06:30", note: "Pengiriman ayam dari PT. Peternakan Maju" },
+  { id: 2, type: "out", qty: 40, user: "Sistem (POS)", date: "16 Apr 2026, 14:20", note: "Penjualan ke Toko Ayam Bagus" },
+  { id: 3, type: "out", qty: 28, user: "Sistem (POS)", date: "14 Apr 2026, 09:15", note: "Penjualan ke Pedagang Pasar Induk" },
+  { id: 4, type: "out", qty: 30, user: "Dewi Rahayu", date: "12 Apr 2026, 15:45", note: "Pesanan khusus Restoran Ayam Goreng" },
+  { id: 5, type: "out", qty: 32, user: "Sistem (POS)", date: "08 Apr 2026, 10:30", note: "Penjualan retail mingguan" },
+  { id: 6, type: "in", qty: 100, user: "Bambang Irawan", date: "01 Apr 2026, 07:00", note: "Pengiriman dari kandang backup" },
 ];
 
 export function StockDetail() {
@@ -35,28 +35,28 @@ export function StockDetail() {
 
   const product = {
     id: "STK-001",
-    name: "iPhone 15 Pro 256GB",
-    sku: "APL-IPH15P-256",
-    category: "Elektronik",
-    brand: "Apple",
-    stock: 45,
-    minStock: 10,
-    price: 14999000,
-    buyPrice: 12500000,
+    name: "Ayam Broiler Siap Potong (per ekor)",
+    sku: "AYM-BRL-SP-1",
+    category: "Ayam Potong",
+    brand: "Ayam Lokal Premium",
+    stock: 150,
+    minStock: 50,
+    price: 35000,
+    buyPrice: 28000,
     status: "available",
-    location: "Rak A-03",
-    supplier: "PT. Apple Indonesia",
-    lastRestock: "05 Apr 2026",
-    description: "Smartphone premium Apple dengan chip A17 Pro, kamera 48MP, dan layar ProMotion 120Hz. Tersedia dalam warna Natural Titanium, Black Titanium, White Titanium, Blue Titanium.",
-    weight: "187g",
-    dimension: "14.67 x 7.09 x 0.83 cm",
+    location: "Kandang A-01",
+    supplier: "PT. Peternakan Maju",
+    lastRestock: "18 Apr 2026",
+    description: "Ayam broiler berkualitas tinggi, siap untuk dijual potong. Berusia 5 minggu, berat ideal 1.8-2kg per ekor. Dipelihara dengan standar kesehatan internasional dan pakan berkualitas premium untuk hasil daging yang optimal.",
+    weight: "1.8kg",
+    dimension: "30 x 25 x 20 cm",
   };
 
   const statsCards = [
-    { label: "Stok Saat Ini", value: `${product.stock} unit`, icon: <Box size={18} className="text-blue-600" />, bg: "bg-blue-50" },
-    { label: "Rata-rata Keluar/Hari", value: "~6.5 unit", icon: <TrendingDown size={18} className="text-red-500" />, bg: "bg-red-50" },
+    { label: "Stok Saat Ini", value: `${product.stock} ekor`, icon: <Box size={18} className="text-blue-600" />, bg: "bg-blue-50" },
+    { label: "Rata-rata Terjual/Hari", value: "~22 ekor", icon: <TrendingDown size={18} className="text-red-500" />, bg: "bg-red-50" },
     { label: "Estimasi Habis", value: "~7 hari", icon: <Calendar size={18} className="text-orange-500" />, bg: "bg-orange-50" },
-    { label: "Total Terjual (Bulan Ini)", value: "131 unit", icon: <TrendingUp size={18} className="text-green-600" />, bg: "bg-green-50" },
+    { label: "Total Terjual (Bulan Ini)", value: "450 ekor", icon: <TrendingUp size={18} className="text-green-600" />, bg: "bg-green-50" },
   ];
 
   return (
@@ -75,7 +75,10 @@ export function StockDetail() {
             <p className="text-sm text-gray-500 mt-0.5">Informasi lengkap stok produk</p>
           </div>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm hover:opacity-90 transition-colors" style={{ background: "#1E3A8A" }}>
+        <button 
+          onClick={() => navigate(`/stock/edit?id=${product.id}`)}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm hover:opacity-90 transition-colors" 
+          style={{ background: "#1E3A8A" }}>
           <Edit2 size={14} />
           <span>Edit Produk</span>
         </button>
