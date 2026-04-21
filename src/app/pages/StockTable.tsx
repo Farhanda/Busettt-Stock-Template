@@ -1,24 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import {
   Search, Filter, Plus, ChevronLeft, ChevronRight,
   ArrowUpDown, Eye, Pencil, Trash2, Download, RefreshCcw, Package
 } from "lucide-react";
-
-const stockData = [
-  { id: "STK-001", name: "Ayam Broiler Siap Potong (per ekor)", sku: "AYM-BRL-SP-1", category: "Ayam Potong", stock: 150, min: 50, price: 35000, status: "available", updated: "18 Apr 2026" },
-  { id: "STK-002", name: "Ayam Kampung Premium (per ekor)", sku: "AYM-KPG-PM-1", category: "Ayam Hidup", stock: 85, min: 20, price: 65000, status: "available", updated: "18 Apr 2026" },
-  { id: "STK-003", name: "Telur Ayam Segar (per karton 30pc)", sku: "TLR-AYM-SF-30", category: "Telur", stock: 12, min: 10, price: 45000, status: "low", updated: "17 Apr 2026" },
-  { id: "STK-004", name: "Ayam Jawa Super (per ekor)", sku: "AYM-JWS-SP-1", category: "Ayam Hidup", stock: 220, min: 50, price: 55000, status: "available", updated: "17 Apr 2026" },
-  { id: "STK-005", name: "Daging Ayam Fillet (per kg)", sku: "DGG-AYM-FLT-1", category: "Hasil Olahan", stock: 25, min: 10, price: 75000, status: "available", updated: "16 Apr 2026" },
-  { id: "STK-006", name: "Telur Asin (per karton 20pc)", sku: "TLR-ASN-20", category: "Hasil Olahan", stock: 45, min: 15, price: 55000, status: "available", updated: "16 Apr 2026" },
-  { id: "STK-007", name: "Ayam Broiler Bibit (per ekor)", sku: "AYM-BRL-BT-1", category: "Ayam Bibit", stock: 0, min: 30, price: 25000, status: "empty", updated: "15 Apr 2026" },
-  { id: "STK-008", name: "Daging Ayam Boneless 500g", sku: "DGG-AYM-BLS-500", category: "Hasil Olahan", stock: 120, min: 30, price: 42000, status: "available", updated: "15 Apr 2026" },
-  { id: "STK-009", name: "Ayam Goreng Siap Jual (per ekor)", sku: "AYM-GRG-SJ-1", category: "Hasil Olahan", stock: 30, min: 15, price: 45000, status: "available", updated: "14 Apr 2026" },
-  { id: "STK-010", name: "Telur Omega 3 (per karton 30pc)", sku: "TLR-OMG3-30", category: "Telur", stock: 8, min: 20, price: 65000, status: "low", updated: "14 Apr 2026" },
-  { id: "STK-011", name: "Kulit Ayam Goreng (per kg)", sku: "KLT-AYM-GRG-1", category: "Hasil Olahan", stock: 50, min: 10, price: 28000, status: "available", updated: "13 Apr 2026" },
-  { id: "STK-012", name: "Ayam Petelur Afkir (per ekor)", sku: "AYM-PTL-AFR-1", category: "Ayam Hidup", stock: 75, min: 20, price: 22000, status: "available", updated: "13 Apr 2026" },
-];
+import stockData from "../assets/data/stock_data.json";
+import stockMovement from "../assets/data/stock_movement.json";
+import * as XLSX from 'xlsx';
+import { Modal } from "../components/ui/modal";
+import { useIsMobile } from "../components/ui/use-mobile";
 
 const categories = ["Semua", "Ayam Potong", "Ayam Hidup", "Telur", "Hasil Olahan", "Ayam Bibit"];
 const statusOptions = ["Semua", "available", "low", "empty"];
@@ -31,6 +21,7 @@ const statusConfig: Record<string, { label: string; class: string }> = {
 
 export function StockTable() {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("Semua");
   const [status, setStatus] = useState("Semua");
@@ -40,10 +31,28 @@ export function StockTable() {
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, itemId: "", itemName: "" });
   const [deleting, setDeleting] = useState(false);
   const perPage = 8;
+  // 1. Initialize state with an empty array or the imported JSON
+  const [stocks, setStocks] = useState(stockData); 
 
-  const filtered = stockData
+  // 2. Optional: Load from LocalStorage to see "Add" or "Edit" changes
+  useEffect(() => {
+    const savedData = localStorage.getItem("stock_db");
+    const savedMovements = localStorage.getItem("movements_db");
+    if (savedData) {
+      setStocks(JSON.parse(savedData));
+    } else {
+      // If no local data exists, save the initial JSON to LocalStorage for future use
+      localStorage.setItem("stock_db", JSON.stringify(stockData));
+    }
+    if (!savedMovements) {
+      localStorage.setItem("movements_db", JSON.stringify(stockMovement));
+    }
+  }, []);
+
+  const filtered = stocks
     .filter((item) => {
-      const matchSearch = item.name.toLowerCase().includes(search.toLowerCase()) || item.sku.toLowerCase().includes(search.toLowerCase());
+      // const matchSearch = item.name.toLowerCase().includes(search.toLowerCase()) || item.sku.toLowerCase().includes(search.toLowerCase());
+      const matchSearch = item.name.toLowerCase().includes(search.toLowerCase());
       const matchCat = category === "Semua" || item.category === category;
       const matchStatus = status === "Semua" || item.status === status;
       return matchSearch && matchCat && matchStatus;
@@ -74,24 +83,59 @@ export function StockTable() {
 
   const handleConfirmDelete = () => {
     setDeleting(true);
-    // Simulate API call
+    const updated = stocks.filter(s => s.id !== deleteModal.itemId);
+    localStorage.setItem("stock_db", JSON.stringify(updated));
+    
     setTimeout(() => {
+      setStocks(updated);
       setDeleting(false);
       handleCloseDeleteModal();
-      // In real app, update the list here
     }, 1000);
+  };
+
+  const handleExport = () => {
+    // 1. Prepare data for export (using the 'filtered' list ensures exports match what users see)
+    const exportData = filtered.map(item => ({
+      'ID': item.id,
+      'Nama Produk': item.name,
+      'SKU': item.sku,
+      'Kategori': item.category,
+      'Stok Saat Ini': item.stock,
+      'Stok Minimum': item.minStock,
+      'Harga (Rp)': item.price,
+      'Status': statusConfig[item.status]?.label || item.status,
+      'Update Terakhir': item.updated
+    }));
+
+    // 2. Create worksheet and workbook
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Inventory");
+
+    // 3. Set column widths for better readability
+    const wscols = [
+      { wch: 12 }, { wch: 40 }, { wch: 20 }, { wch: 15 }, 
+      { wch: 12 }, { wch: 12 }, { wch: 15 }, { wch: 12 }, { wch: 15 }
+    ];
+    worksheet['!cols'] = wscols;
+
+    // 4. Trigger download
+    XLSX.writeFile(workbook, `Stock_Inventory_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
   return (
     <div className="p-6 space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
+      <div className={`flex ${isMobile ? 'flex-col' : 'items-center'} justify-between`}>
+        <div className={`flex flex-col text-gray-900`}>
           <h1 className="text-gray-900">Table Stock</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Kelola dan pantau semua data stok produk</p>
+          <p className={`text-sm text-gray-500 mt-0.5 ${isMobile ? 'mb-2' : 'mb-1'}`}>Kelola dan pantau semua data stok produk</p>
         </div>
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+          <button 
+            onClick={handleExport}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+          >
             <Download size={14} />
             <span className="hidden sm:inline">Export</span>
           </button>
@@ -148,7 +192,7 @@ export function StockTable() {
 
       {/* Table */}
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="custom-scrollbar overflow-x-auto">
           <table className="w-full">
             <thead style={{ background: "#F8FAFF" }}>
               <tr>
@@ -198,10 +242,10 @@ export function StockTable() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <span className={`text-sm font-semibold ${item.stock === 0 ? "text-red-600" : item.stock < item.min ? "text-yellow-600" : "text-gray-800"}`}>
+                        <span className={`text-sm font-semibold ${item.stock === 0 ? "text-red-600" : item.stock < item.minStock ? "text-yellow-600" : "text-gray-800"}`}>
                           {item.stock}
                         </span>
-                        <span className="text-xs text-gray-400">/ min {item.min}</span>
+                        <span className="text-xs text-gray-400">/ min {item.minStock}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3 text-sm font-medium text-gray-800 whitespace-nowrap">
@@ -216,7 +260,7 @@ export function StockTable() {
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-1.5">
                         <button
-                          onClick={() => navigate("/stock/detail")}
+                          onClick={() => navigate(`/stock/detail?id=${item.id}`)}
                           className="p-1.5 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-blue-600 transition-colors"
                           title="Detail"
                         >
@@ -279,48 +323,32 @@ export function StockTable() {
 
       {/* Delete Confirmation Modal */}
       {deleteModal.isOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-100 mx-auto">
-              <Trash2 size={24} className="text-red-600" />
-            </div>
-            
-            <div className="text-center">
-              <h2 className="text-lg font-bold text-gray-900 mb-1">Hapus Produk?</h2>
-              <p className="text-sm text-gray-600">
-                Anda yakin ingin menghapus <strong>{deleteModal.itemName}</strong>? Tindakan ini tidak dapat dibatalkan.
-              </p>
-            </div>
-
-            <div className="flex gap-3 pt-2">
-              <button
-                onClick={handleCloseDeleteModal}
-                disabled={deleting}
-                className="flex-1 px-4 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+        <Modal
+          isOpen={deleteModal.isOpen}
+          onClose={handleCloseDeleteModal}
+          title="Konfirmasi Hapus"
+          size="sm"
+          footer={
+            <>
+              <button 
+                onClick={handleCloseDeleteModal} 
+                className="px-4 py-2 text-gray-600 font-medium"
               >
                 Batal
               </button>
-              <button
-                onClick={handleConfirmDelete}
-                disabled={deleting}
-                className="flex-1 px-4 py-2.5 rounded-lg text-white font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                style={{ background: "#DC2626" }}
+              <button 
+                onClick={handleConfirmDelete} 
+                className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium"
               >
-                {deleting ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Menghapus...
-                  </>
-                ) : (
-                  <>
-                    <Trash2 size={16} />
-                    Hapus
-                  </>
-                )}
+                Ya, Hapus
               </button>
-            </div>
-          </div>
-        </div>
+            </>
+          }
+        >
+          <p className="text-gray-600">
+            Apakah Anda yakin ingin menghapus <strong>{deleteModal.itemName}</strong>?
+          </p>
+        </Modal>
       )}
     </div>
   );

@@ -6,6 +6,7 @@ import {
   Radar, PolarGrid, PolarAngleAxis
 } from "recharts";
 import { TrendingUp, ShoppingCart, DollarSign, Users, ArrowUpRight } from "lucide-react";
+import { useIsMobile } from "../components/ui/use-mobile";
 
 const salesMonthly = [
   { month: "Jan", penjualan: 42000000, biaya: 28000000, profit: 14000000, transaksi: 145 },
@@ -94,6 +95,7 @@ const monthlyPerYear = [
 const formatM = (v: number) => `Rp ${(v / 1000000).toFixed(1)}M`;
 
 export function SellingChart() {
+  const isMobile = useIsMobile();
   const [selectedPeriod, setSelectedPeriod] = useState("monthly");
 
   const summaryCards = [
@@ -106,10 +108,10 @@ export function SellingChart() {
   return (
     <div className="p-6 space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className={`flex ${isMobile ? 'flex-col' : 'items-center'} justify-between`}>
         <div>
           <h1 className="text-gray-900">Selling Chart</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Analisis mendalam performa penjualan bisnis Anda</p>
+          <p className={`text-sm text-gray-500 mt-0.5 ${isMobile ? 'mb-2' : 'mb-1'}`}>Analisis mendalam performa penjualan bisnis Anda</p>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-1">
@@ -259,7 +261,7 @@ export function SellingChart() {
             <p className="text-sm text-gray-500 mt-0.5">Berdasarkan revenue bulan ini</p>
           </div>
         </div>
-        <div className="overflow-x-auto">
+        <div className="custom-scrollbar overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-100">

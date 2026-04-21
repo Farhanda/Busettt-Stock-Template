@@ -1,0 +1,81 @@
+[
+    { "id": 1, "productId": "STK-001", "type": "in", "qty": 100, "user": "Admin Gudang", "date": "2026-04-15T08:00:00", "note": "Restok mingguan" },
+    { "id": 2, "productId": "STK-001", "type": "out", "qty": 35, "user": "POS-1", "date": "2026-04-16T10:15:00", "note": "Penjualan retail" },
+    { "id": 3, "productId": "STK-001", "type": "out", "qty": 25, "user": "POS-2", "date": "2026-04-18T14:20:00", "note": "Penjualan retail" },
+
+    { "id": 4, "productId": "STK-002", "type": "in", "qty": 60, "user": "Admin Gudang", "date": "2026-04-14T09:00:00", "note": "Masuk dari kandang" },
+    { "id": 5, "productId": "STK-002", "type": "out", "qty": 20, "user": "POS-1", "date": "2026-04-16T11:00:00", "note": "Pesanan restoran" },
+    { "id": 6, "productId": "STK-002", "type": "out", "qty": 15, "user": "POS-2", "date": "2026-04-19T12:10:00", "note": "Penjualan retail" },
+
+    { "id": 7, "productId": "STK-003", "type": "in", "qty": 40, "user": "Admin Gudang", "date": "2026-04-16T07:00:00", "note": "Kiriman supplier" },
+    { "id": 8, "productId": "STK-003", "type": "out", "qty": 25, "user": "POS-1", "date": "2026-04-17T09:15:00", "note": "Penjualan grosir" },
+    { "id": 9, "productId": "STK-003", "type": "out", "qty": 15, "user": "POS-2", "date": "2026-04-18T13:30:00", "note": "Penjualan retail" },
+
+    { "id": 10, "productId": "STK-004", "type": "in", "qty": 120, "user": "Admin Gudang", "date": "2026-04-12T10:00:00", "note": "Panen" },
+    { "id": 11, "productId": "STK-004", "type": "out", "qty": 50, "user": "POS-1", "date": "2026-04-14T13:00:00", "note": "Kirim cabang" },
+    { "id": 12, "productId": "STK-004", "type": "out", "qty": 30, "user": "POS-2", "date": "2026-04-16T16:00:00", "note": "Penjualan retail" },
+
+    { "id": 13, "productId": "STK-005", "type": "in", "qty": 30, "user": "Admin Gudang", "date": "2026-04-15T08:30:00", "note": "Produksi" },
+    { "id": 14, "productId": "STK-005", "type": "out", "qty": 10, "user": "POS-1", "date": "2026-04-16T10:30:00", "note": "Penjualan retail" },
+    { "id": 15, "productId": "STK-005", "type": "out", "qty": 8, "user": "POS-2", "date": "2026-04-18T14:00:00", "note": "Penjualan retail" },
+
+    { "id": 16, "productId": "STK-006", "type": "in", "qty": 50, "user": "Admin Gudang", "date": "2026-04-15T09:00:00", "note": "Produksi telur asin" },
+    { "id": 17, "productId": "STK-006", "type": "out", "qty": 20, "user": "POS-1", "date": "2026-04-16T11:45:00", "note": "Penjualan retail" },
+    { "id": 18, "productId": "STK-006", "type": "out", "qty": 10, "user": "POS-2", "date": "2026-04-19T13:00:00", "note": "Penjualan retail" },
+
+    { "id": 19, "productId": "STK-007", "type": "in", "qty": 40, "user": "Admin Gudang", "date": "2026-04-13T08:00:00", "note": "Bibit masuk" },
+    { "id": 20, "productId": "STK-007", "type": "out", "qty": 20, "user": "POS-1", "date": "2026-04-15T09:30:00", "note": "Distribusi" },
+    { "id": 21, "productId": "STK-007", "type": "out", "qty": 10, "user": "POS-2", "date": "2026-04-17T12:00:00", "note": "Distribusi" },
+
+    { "id": 22, "productId": "STK-008", "type": "in", "qty": 100, "user": "Admin Gudang", "date": "2026-04-15T08:00:00", "note": "Produksi" },
+    { "id": 23, "productId": "STK-008", "type": "out", "qty": 30, "user": "POS-1", "date": "2026-04-16T10:00:00", "note": "Penjualan retail" },
+    { "id": 24, "productId": "STK-008", "type": "out", "qty": 20, "user": "POS-2", "date": "2026-04-18T14:00:00", "note": "Penjualan retail" },
+
+    { "id": 25, "productId": "STK-009", "type": "in", "qty": 40, "user": "Admin Gudang", "date": "2026-04-14T09:00:00", "note": "Masak batch baru" },
+    { "id": 26, "productId": "STK-009", "type": "out", "qty": 15, "user": "POS-1", "date": "2026-04-16T11:00:00", "note": "Penjualan retail" },
+    { "id": 27, "productId": "STK-009", "type": "out", "qty": 10, "user": "POS-2", "date": "2026-04-18T13:00:00", "note": "Penjualan retail" },
+
+    { "id": 28, "productId": "STK-010", "type": "in", "qty": 30, "user": "Admin Gudang", "date": "2026-04-15T07:30:00", "note": "Kiriman supplier" },
+    { "id": 29, "productId": "STK-010", "type": "out", "qty": 12, "user": "POS-1", "date": "2026-04-16T10:30:00", "note": "Penjualan retail" },
+    { "id": 30, "productId": "STK-010", "type": "out", "qty": 8, "user": "POS-2", "date": "2026-04-18T14:30:00", "note": "Penjualan retail" },
+
+    { "id": 31, "productId": "STK-011", "type": "in", "qty": 60, "user": "Admin Gudang", "date": "2026-04-14T08:00:00", "note": "Produksi" },
+    { "id": 32, "productId": "STK-011", "type": "out", "qty": 20, "user": "POS-1", "date": "2026-04-16T11:00:00", "note": "Penjualan retail" },
+    { "id": 33, "productId": "STK-011", "type": "out", "qty": 15, "user": "POS-2", "date": "2026-04-19T12:00:00", "note": "Penjualan retail" },
+
+    { "id": 34, "productId": "STK-012", "type": "in", "qty": 80, "user": "Admin Gudang", "date": "2026-04-13T09:00:00", "note": "Masuk kandang" },
+    { "id": 35, "productId": "STK-012", "type": "out", "qty": 25, "user": "POS-1", "date": "2026-04-16T10:00:00", "note": "Penjualan" },
+    { "id": 36, "productId": "STK-012", "type": "out", "qty": 20, "user": "POS-2", "date": "2026-04-18T13:00:00", "note": "Penjualan" },
+
+    { "id": 37, "productId": "STK-013", "type": "in", "qty": 70, "user": "Admin Gudang", "date": "2026-04-18T08:30:00", "note": "Produksi baru" },
+    { "id": 38, "productId": "STK-013", "type": "out", "qty": 25, "user": "POS-1", "date": "2026-04-19T10:00:00", "note": "Penjualan retail" },
+    { "id": 39, "productId": "STK-013", "type": "out", "qty": 15, "user": "POS-2", "date": "2026-04-19T14:00:00", "note": "Penjualan retail" },
+
+    { "id": 40, "productId": "STK-014", "type": "in", "qty": 50, "user": "Admin Gudang", "date": "2026-04-17T08:00:00", "note": "Masuk kandang" },
+    { "id": 41, "productId": "STK-014", "type": "out", "qty": 15, "user": "POS-1", "date": "2026-04-18T11:00:00", "note": "Penjualan" },
+    { "id": 42, "productId": "STK-014", "type": "out", "qty": 10, "user": "POS-2", "date": "2026-04-20T12:00:00", "note": "Penjualan" },
+
+    { "id": 43, "productId": "STK-015", "type": "in", "qty": 30, "user": "Admin Gudang", "date": "2026-04-17T09:00:00", "note": "Restok" },
+    { "id": 44, "productId": "STK-015", "type": "out", "qty": 10, "user": "POS-1", "date": "2026-04-18T12:00:00", "note": "Penjualan retail" },
+    { "id": 45, "productId": "STK-015", "type": "out", "qty": 8, "user": "POS-2", "date": "2026-04-19T15:00:00", "note": "Penjualan retail" },
+
+    { "id": 46, "productId": "STK-016", "type": "in", "qty": 150, "user": "Admin Gudang", "date": "2026-04-15T07:00:00", "note": "Panen telur" },
+    { "id": 47, "productId": "STK-016", "type": "out", "qty": 50, "user": "POS-1", "date": "2026-04-16T10:00:00", "note": "Penjualan grosir" },
+    { "id": 48, "productId": "STK-016", "type": "out", "qty": 30, "user": "POS-2", "date": "2026-04-18T13:00:00", "note": "Penjualan retail" },
+
+    { "id": 49, "productId": "STK-017", "type": "in", "qty": 20, "user": "Admin Gudang", "date": "2026-04-17T08:00:00", "note": "Produksi" },
+    { "id": 50, "productId": "STK-017", "type": "out", "qty": 10, "user": "POS-1", "date": "2026-04-18T11:00:00", "note": "Penjualan retail" },
+    { "id": 51, "productId": "STK-017", "type": "out", "qty": 5, "user": "POS-2", "date": "2026-04-19T14:00:00", "note": "Penjualan retail" },
+
+    { "id": 52, "productId": "STK-018", "type": "in", "qty": 80, "user": "Admin Gudang", "date": "2026-04-15T08:00:00", "note": "Restok" },
+    { "id": 53, "productId": "STK-018", "type": "out", "qty": 25, "user": "POS-1", "date": "2026-04-16T10:00:00", "note": "Penjualan retail" },
+    { "id": 54, "productId": "STK-018", "type": "out", "qty": 20, "user": "POS-2", "date": "2026-04-18T14:00:00", "note": "Penjualan retail" },
+
+    { "id": 55, "productId": "STK-019", "type": "in", "qty": 40, "user": "Admin Gudang", "date": "2026-04-15T08:30:00", "note": "Restok" },
+    { "id": 56, "productId": "STK-019", "type": "out", "qty": 15, "user": "POS-1", "date": "2026-04-16T11:00:00", "note": "Penjualan retail" },
+    { "id": 57, "productId": "STK-019", "type": "out", "qty": 10, "user": "POS-2", "date": "2026-04-19T12:30:00", "note": "Penjualan retail" },
+
+    { "id": 58, "productId": "STK-020", "type": "in", "qty": 50, "user": "Admin Gudang", "date": "2026-04-15T08:00:00", "note": "Restok telur bebek" },
+    { "id": 59, "productId": "STK-020", "type": "out", "qty": 15, "user": "POS-1", "date": "2026-04-16T10:30:00", "note": "Penjualan retail" },
+    { "id": 60, "productId": "STK-020", "type": "out", "qty": 12, "user": "POS-2", "date": "2026-04-19T11:45:00", "note": "Penjualan retail" }
+]

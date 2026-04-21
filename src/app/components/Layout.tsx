@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router";
 import {
   LayoutDashboard,
@@ -27,6 +27,8 @@ import {
   Sun,
 } from "lucide-react";
 
+import { useIsMobile } from "./ui/use-mobile";
+
 interface NavItem {
   label: string;
   icon: React.ReactNode;
@@ -50,9 +52,22 @@ const navItems: NavItem[] = [
     ],
   },
   {
+    label: "Menu Product",
+    icon: <Package size={18} />,
+    path: "#",
+  },
+  {
     label: "Selling Chart",
     icon: <TrendingUp size={18} />,
     path: "/selling-chart",
+  },
+  {
+    label: "Ledger",
+    icon: <FileText size={18} />,
+    children: [
+      { label: "Gross Profit", icon: <Table2 size={16} />, path: "#" },
+      { label: "Detail Report", icon: <Eye size={16} />, path: "#" },
+    ],
   },
   {
     label: "Report",
@@ -76,11 +91,26 @@ export function Layout() {
     Stock: true,
     Report: false,
   });
+  const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+
+  // 1. Logic: Auto-close mobile sidebar when the route changes
+  useEffect(() => {
+    if (isMobile) {
+      setMobileSidebarOpen(false);
+    }
+  }, [location.pathname, isMobile]);
+
+  // 2. Logic: Ensure sidebar state is consistent when resizing
+  useEffect(() => {
+    if (isMobile) {
+      setSidebarOpen(true); // Ensure content is visible inside the mobile drawer
+    }
+  }, [isMobile]);
 
   const toggleMenu = (label: string) => {
     setOpenMenus((prev) => ({ ...prev, [label]: !prev[label] }));
@@ -95,6 +125,15 @@ export function Layout() {
     return children?.some((c) => location.pathname === c.path) ?? false;
   };
 
+  const toggleMobileSidebar = () => {
+    // If we are opening the sidebar, close the dropdowns
+    if (!mobileSidebarOpen) {
+      setSettingsOpen(false);
+      setNotificationOpen(false);
+    }
+    setMobileSidebarOpen(!mobileSidebarOpen);
+  };
+
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       {/* Logo */}
@@ -104,14 +143,14 @@ export function Layout() {
         </div>
         {sidebarOpen && (
           <div>
-            <p className="text-white text-sm font-semibold leading-none">StockManager</p>
-            <p className="text-blue-300 text-xs mt-0.5">v2.0 Pro</p>
+            <p className="text-white text-sm font-semibold leading-none">BST Stock</p>
+            <p className="text-blue-300 text-xs mt-0.5">v0.1</p>
           </div>
         )}
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto py-4 px-3">
+      <nav className="flex-1 custom-scrollbar overflow-y-auto py-4 px-3">
         {navItems.map((item) => (
           <div key={item.label} className="mb-1">
             {item.path ? (
@@ -178,8 +217,8 @@ export function Layout() {
               AD
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white text-sm font-medium truncate">Admin User</p>
-              <p className="text-blue-300 text-xs truncate">admin@stock.id</p>
+              <p className="text-white text-sm font-medium truncate">Admin</p>
+              <p className="text-blue-300 text-xs truncate">admin@bst.id</p>
             </div>
           </div>
         )}
@@ -207,8 +246,15 @@ export function Layout() {
       {/* Mobile Sidebar Overlay */}
       {mobileSidebarOpen && (
         <div className="md:hidden fixed inset-0 z-50 flex">
-          <div className="fixed inset-0 bg-black/50" onClick={() => setMobileSidebarOpen(false)} />
-          <aside className="relative w-64 flex flex-col z-10" style={{ background: "#1E3A8A" }}>
+          {/* Overlay backdrop */}
+          <div 
+            className="fixed inset-0 bg-black/50 animate-in fade-in duration-300" 
+            onClick={() => setMobileSidebarOpen(false)} 
+          />
+          <aside 
+            className="relative w-64 flex flex-col z-10 animate-in slide-in-from-left duration-300" 
+            style={{ background: "#1E3A8A" }}
+          >
             <button
               onClick={() => setMobileSidebarOpen(false)}
               className="absolute top-4 right-4 text-white/70 hover:text-white"
@@ -226,10 +272,7 @@ export function Layout() {
         <header className="flex items-center justify-between px-4 md:px-6 py-4 bg-white border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center gap-3">
             <button
-              onClick={() => {
-                setSidebarOpen(!sidebarOpen);
-                setMobileSidebarOpen(!mobileSidebarOpen);
-              }}
+              onClick={ isMobile ? toggleMobileSidebar : () => setSidebarOpen(!sidebarOpen)}
               className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-500"
             >
               <Menu size={20} />
@@ -258,11 +301,11 @@ export function Layout() {
               
               {/* Notification Dropdown */}
               {notificationOpen && (
-                <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-100 z-50 overflow-hidden">
+                <div className={`absolute ${isMobile ? 'right-[calc(4px-7rem)]' : 'right-0'} mt-2 ${isMobile ? 'w-72' : 'w-80'} bg-white rounded-xl shadow-lg border border-gray-100 z-50 overflow-hidden`}>
                   <div className="p-4 border-b border-gray-100 bg-gray-50">
                     <h3 className="font-semibold text-gray-900 text-sm">Notifikasi</h3>
                   </div>
-                  <div className="max-h-96 overflow-y-auto">
+                  <div className="max-h-96 custom-scrollbar overflow-y-auto">
                     {[
                       { id: 1, title: "Stok Menipis", message: "Ayam Broiler Siap Potong stok mencapai minimum", time: "5 menit lalu", icon: "📦", unread: true },
                       { id: 2, title: "Pemesanan Baru", message: "Ada 8 pemesanan ayam baru dari toko retail", time: "15 menit lalu", icon: "🛒", unread: true },
@@ -307,7 +350,7 @@ export function Layout() {
 
               {/* Settings Dropdown */}
               {settingsOpen && (
-                <div className="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-lg border border-gray-100 z-50 overflow-hidden">
+                <div className={`absolute ${isMobile ? 'right-[calc(4px-4rem)]' : 'right-0'} mt-2 w-72 bg-white rounded-xl shadow-lg border border-gray-100 z-50 overflow-hidden`}>
                   <div className="p-4 border-b border-gray-100 bg-gray-50">
                     <h3 className="font-semibold text-gray-900 text-sm">Pengaturan</h3>
                   </div>
@@ -379,7 +422,7 @@ export function Layout() {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 custom-scrollbar overflow-y-auto">
           <Outlet />
         </main>
       </div>

@@ -1,71 +1,124 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   BarChart, Bar, LineChart, Line, AreaChart, Area,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, PieChart, Pie, Cell
 } from "recharts";
 import { BarChart2, TrendingDown, TrendingUp, Package, Filter } from "lucide-react";
-
-const monthlyStock = [
-  { month: "Jan", masuk: 580, keluar: 320, saldo: 2100 },
-  { month: "Feb", masuk: 420, keluar: 380, saldo: 2140 },
-  { month: "Mar", masuk: 750, keluar: 410, saldo: 2480 },
-  { month: "Apr", masuk: 380, keluar: 290, saldo: 2570 },
-  { month: "Mei", masuk: 620, keluar: 450, saldo: 2740 },
-  { month: "Jun", masuk: 490, keluar: 520, saldo: 2710 },
-  { month: "Jul", masuk: 830, keluar: 480, saldo: 3060 },
-  { month: "Agu", masuk: 560, keluar: 390, saldo: 3230 },
-  { month: "Sep", masuk: 470, keluar: 440, saldo: 3260 },
-  { month: "Okt", masuk: 710, keluar: 510, saldo: 3460 },
-  { month: "Nov", masuk: 650, keluar: 580, saldo: 3530 },
-  { month: "Des", masuk: 890, keluar: 620, saldo: 3800 },
-];
-
-const categoryStock = [
-  { name: "Ayam Potong", value: 450, color: "#1E3A8A" },
-  { name: "Ayam Hidup", value: 680, color: "#3B82F6" },
-  { name: "Telur", value: 320, color: "#60A5FA" },
-  { name: "Hasil Olahan", value: 150, color: "#93C5FD" },
-  { name: "Ayam Bibit", value: 280, color: "#BFDBFE" },
-];
-
-const topMoving = [
-  { name: "Ayam Broiler Siap Potong", keluar: 180, category: "Ayam Potong" },
-  { name: "Ayam Kampung Premium", keluar: 165, category: "Ayam Hidup" },
-  { name: "Telur Ayam Segar", keluar: 142, category: "Telur" },
-  { name: "Daging Ayam Fillet", keluar: 128, category: "Hasil Olahan" },
-  { name: "Ayam Jawa Super", keluar: 115, category: "Ayam Hidup" },
-  { name: "Ayam Goreng Siap Jual", keluar: 98, category: "Hasil Olahan" },
-];
-
-const weeklyTrend = [
-  { day: "Sen", masuk: 45, keluar: 38 },
-  { day: "Sel", masuk: 62, keluar: 55 },
-  { day: "Rab", masuk: 38, keluar: 71 },
-  { day: "Kam", masuk: 85, keluar: 62 },
-  { day: "Jum", masuk: 55, keluar: 48 },
-  { day: "Sab", masuk: 72, keluar: 85 },
-  { day: "Min", masuk: 28, keluar: 32 },
-];
+import initialInventoryData from "../assets/data/stock_data.json";
+import initialMovement from "../assets/data/stock_movement.json";
+import { calculateStockAnalytics } from "../assets/utils/stock_analytics"; // Adjust path accordingly
+import { useIsMobile } from "../components/ui/use-mobile";
 
 export function StockChart() {
+  const isMobile = useIsMobile();
   const [selectedPeriod, setSelectedPeriod] = useState("monthly");
   const [selectedYear, setSelectedYear] = useState("2026");
+  
+  // Flow State: Managing live data from LocalStorage
+  const [stocks, setStocks] = useState(initialInventoryData);
+  const [movements, setMovements] = useState([]);
+  // const [analytics, setAnalytics] = useState(initialAnalyticsData);
+  const [categoryData, setCategoryData] = useState<{ name: string; value: number; color: string }[]>([]);
+
+  useEffect(() => {
+    // FLOW STEP 1: Sync with LocalStorage to get latest "Add/Edit" changes
+    // 1. Sync Stocks
+    const savedStocks = localStorage.getItem("stock_db");
+    const currentStocks = savedStocks ? JSON.parse(savedStocks) : initialInventoryData;
+    setStocks(currentStocks);
+
+    // 2. Sync Movements (Transaction History)
+    const savedMovements = localStorage.getItem("movements_db");
+    const currentMovements = savedMovements ? JSON.parse(savedMovements) : initialMovement;
+    setMovements(currentMovements);
+
+    // FLOW STEP 2: Calculate Pie Chart distribution dynamically from current stocks
+    const counts: Record<string, number> = {};
+    currentStocks.forEach((item: any) => {
+      counts[item.category] = (counts[item.category] || 0) + 1;
+    });
+
+    const colors = ["#1E3A8A", "#3B82F6", "#10B981", "#EF4444", "#F59E0B", "#8B5CF6"];
+    const distribution = Object.keys(counts).map((cat, index) => ({
+      name: cat,
+      value: counts[cat],
+      color: colors[index % colors.length]
+    }));
+    setCategoryData(distribution);
+
+    // Note: In a real app, you'd also fetch analytics from an API here
+  }, []);
+  useEffect(() => {
+    const savedMovements = localStorage.getItem("movements_db");
+    if (!savedMovements) {
+      localStorage.setItem("movements_db", JSON.stringify(initialMovement));
+    }
+  }, []);
+
+  // FLOW STEP 3: Replace JSON with Dynamic Calculation
+  const analytics = useMemo(() => {
+    return calculateStockAnalytics(movements, stocks);
+  }, [movements, stocks]);
+
+  // FLOW STEP 3: Calculate Summary Stats dynamically
+  // These derive values from analytics history and current inventory stock levels
+  const totalMasuk = analytics.monthlyHistory.reduce((acc, curr) => acc + curr.masuk, 0);
+  const totalKeluar = analytics.monthlyHistory.reduce((acc, curr) => acc + curr.keluar, 0);
+  
+  // "Saldo Stok Akhir" is the sum of current quantity in your inventory list
+  const currentSaldo = stocks.reduce((acc, curr) => acc + (curr.stock || 0), 0);
+  
+  // Inventory Turnover Calculation: Total Keluar / Average Saldo
+  const avgSaldo = analytics.monthlyHistory.reduce((acc, curr) => acc + curr.saldo, 0) / analytics.monthlyHistory.length;
+  const turnover = (totalKeluar / avgSaldo).toFixed(1);
 
   const summaryStats = [
-    { label: "Total Masuk (YTD)", value: "7,350", unit: "unit", icon: <TrendingUp size={18} className="text-green-600" />, bg: "bg-green-50", change: "+15.3%" },
-    { label: "Total Keluar (YTD)", value: "5,390", unit: "unit", icon: <TrendingDown size={18} className="text-red-500" />, bg: "bg-red-50", change: "+12.8%" },
-    { label: "Saldo Stok Akhir", value: "3,800", unit: "unit", icon: <Package size={18} className="text-blue-600" />, bg: "bg-blue-50", change: "+26.7%" },
-    { label: "Perputaran Stok", value: "2.4x", unit: "per tahun", icon: <BarChart2 size={18} className="text-violet-600" />, bg: "bg-violet-50", change: "+0.3x" },
+    { 
+      label: "Total Masuk (YTD)", 
+      value: totalMasuk.toLocaleString(), 
+      unit: "unit", 
+      icon: <TrendingUp size={18} className="text-green-600" />, 
+      bg: "bg-green-50", 
+      change: "+15.3%" 
+    },
+    { 
+      label: "Total Keluar (YTD)", 
+      value: totalKeluar.toLocaleString(), 
+      unit: "unit", 
+      icon: <TrendingDown size={18} className="text-red-500" />, 
+      bg: "bg-red-50", 
+      change: "+12.8%" 
+    },
+    { 
+      label: "Saldo Stok Akhir", 
+      value: currentSaldo.toLocaleString(), 
+      unit: "unit", 
+      icon: <Package size={18} className="text-blue-600" />, 
+      bg: "bg-blue-50", 
+      change: "+26.7%" 
+    },
+    { 
+      label: "Perputaran Stok", 
+      value: `${turnover}x`, 
+      unit: "per tahun", 
+      icon: <BarChart2 size={18} className="text-violet-600" />, 
+      bg: "bg-violet-50", 
+      change: "+0.3x" 
+    },
   ];
 
+  const monthlyStock = analytics.monthlyHistory;
+  const weeklyTrend = analytics.weeklyHistory ?? analytics.monthlyHistory;
+  const topMoving = analytics.topMoving;
+  
   return (
     <div className="p-6 space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className={`flex ${isMobile ? 'flex-col' : 'items-center'} justify-between`}>
         <div>
           <h1 className="text-gray-900">Stock Chart</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Analisis visual pergerakan dan tren stok produk</p>
+          <p className={`text-sm text-gray-500 mt-0.5 ${isMobile ? 'mb-2' : 'mb-1'}`}>Analisis visual pergerakan dan tren stok produk</p>
         </div>
         <div className="flex items-center gap-2">
           <select
@@ -136,8 +189,8 @@ export function StockChart() {
           </div>
           <ResponsiveContainer width="100%" height={200}>
             <PieChart>
-              <Pie data={categoryStock} cx="50%" cy="50%" innerRadius={55} outerRadius={85} paddingAngle={3} dataKey="value">
-                {categoryStock.map((entry, index) => (
+              <Pie data={categoryData} cx="50%" cy="50%" innerRadius={55} outerRadius={85} paddingAngle={3} dataKey="value">
+                {categoryData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
@@ -145,7 +198,7 @@ export function StockChart() {
             </PieChart>
           </ResponsiveContainer>
           <div className="mt-3 space-y-2">
-            {categoryStock.map((cat) => (
+            {categoryData.map((cat) => (
               <div key={cat.name} className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-sm flex-shrink-0" style={{ background: cat.color }} />

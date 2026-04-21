@@ -36,7 +36,7 @@ const typeColors: Record<string, string> = {
   Supplier: "bg-teal-50 text-teal-700",
 };
 
-export function ReportTable() {
+export function GrossProfitTable() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [type, setType] = useState("Semua");
@@ -61,8 +61,8 @@ export function ReportTable() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-gray-900">Table Report</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Kelola dan akses semua laporan bisnis</p>
+          <h1 className="text-gray-900">Table Gross Profit</h1>
+          <p className="text-sm text-gray-500 mt-0.5">Kelola dan akses semua gross profit</p>
         </div>
         <div className="flex items-center gap-2">
           <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
@@ -71,7 +71,7 @@ export function ReportTable() {
           </button>
           <button className="flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm hover:opacity-90 transition-colors" style={{ background: "#1E3A8A" }}>
             <FileText size={14} />
-            <span className="hidden sm:inline">Buat Laporan</span>
+            <span className="hidden sm:inline">Buat Gross Profit</span>
           </button>
         </div>
       </div>
@@ -79,12 +79,12 @@ export function ReportTable() {
       {/* Summary Row */}
       <div className="grid grid-cols-3 gap-4">
         {[
-          { label: "Total Laporan", value: reportData.length, color: "#1E3A8A", bg: "#EFF6FF" },
-          { label: "Selesai", value: reportData.filter((r) => r.status === "completed").length, color: "#16a34a", bg: "#f0fdf4" },
-          { label: "Dalam Proses", value: reportData.filter((r) => r.status !== "completed").length, color: "#d97706", bg: "#fffbeb" },
+          { label: "Total Gross Profit", value: 'Rp. 1.000.000', color: "#1E3A8A", bg: "#EFF6FF" },
+          { label: "Operasional", value: 'Rp. 700.000', color: "#16a34a", bg: "#f0fdf4" },
+          { label: "Marketing", value: 'Rp. 300.000', color: "#d97706", bg: "#fffbeb" },
         ].map((s) => (
           <div key={s.label} className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold flex-shrink-0" style={{ background: s.bg, color: s.color }}>
+            <div className="p-4 w-auto h-10 rounded-xl flex items-center justify-center text-lg font-bold flex-shrink-0" style={{ background: s.bg, color: s.color }}>
               {s.value}
             </div>
             <p className="text-sm text-gray-600">{s.label}</p>
@@ -179,7 +179,7 @@ export function ReportTable() {
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-1.5">
                         <button
-                          onClick={() => navigate(`/report/detail?id=${rpt.id}`)}
+                          onClick={() => navigate("/report/detail")}
                           className="p-1.5 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-blue-600 transition-colors"
                           title="Detail"
                         >

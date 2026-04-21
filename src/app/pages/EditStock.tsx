@@ -9,9 +9,9 @@ const categories = ["Ayam Potong", "Ayam Hidup", "Ayam Bibit", "Telur", "Hasil O
 
 // Sample stock data - dalam aplikasi sesungguhnya, ini akan dari API/database
 const stockData = [
-  { id: "STK-001", name: "Ayam Broiler Siap Potong (per ekor)", sku: "AYM-BRL-SP-1", category: "Ayam Potong", brand: "Ayam Lokal", stock: 150, minStock: 50, price: 35000, buyPrice: 28000, status: "available", location: "Kandang A-01", supplier: "PT. Peternakan Maju", weight: "1.8kg", dimension: "30x25x20 cm", description: "Ayam broiler berkualitas tinggi, siap untuk dijual potong. Berusia 5 minggu, berat ideal 1.8-2kg per ekor." },
-  { id: "STK-002", name: "Ayam Kampung Premium (per ekor)", sku: "AYM-KPG-PM-1", category: "Ayam Hidup", brand: "Kampung Grade A", stock: 85, minStock: 20, price: 65000, buyPrice: 50000, status: "available", location: "Kandang B-02", supplier: "Peternak Kampung Jaya", weight: "1.5kg", dimension: "28x22x18 cm", description: "Ayam kampung asli dengan daging yang lebih padat dan berasa. Sangat cocok untuk pemasakan tradisional." },
-  { id: "STK-003", name: "Telur Ayam Segar (per karton 30pc)", sku: "TLR-AYM-SF-30", category: "Telur", brand: "Telur Organik", stock: 12, minStock: 10, price: 45000, buyPrice: 36000, status: "low", location: "Chiller B-01", supplier: "Farm Fresh Indonesia", weight: "1.5kg/karton", dimension: "35x25x10 cm", description: "Telur ayam segar 100% organik, tanpa tambahan bahan kimia. Langsung dari kandang ke meja Anda." },
+  { id: "STK-001", name: "Ayam Broiler Siap Potong (per ekor)", sku: "AYM-BRL-SP-1", category: "Ayam Potong", brand: "Ayam Lokal", stock: 150, min: 50, price: 35000, buyPrice: 28000, status: "available", location: "Kandang A-01", supplier: "PT. Peternakan Maju", weight: "1.8kg", dimension: "30x25x20 cm", description: "Ayam broiler berkualitas tinggi, siap untuk dijual potong. Berusia 5 minggu, berat ideal 1.8-2kg per ekor." },
+  { id: "STK-002", name: "Ayam Kampung Premium (per ekor)", sku: "AYM-KPG-PM-1", category: "Ayam Hidup", brand: "Kampung Grade A", stock: 85, min: 20, price: 65000, buyPrice: 50000, status: "available", location: "Kandang B-02", supplier: "Peternak Kampung Jaya", weight: "1.5kg", dimension: "28x22x18 cm", description: "Ayam kampung asli dengan daging yang lebih padat dan berasa. Sangat cocok untuk pemasakan tradisional." },
+  { id: "STK-003", name: "Telur Ayam Segar (per karton 30pc)", sku: "TLR-AYM-SF-30", category: "Telur", brand: "Telur Organik", stock: 12, min: 10, price: 45000, buyPrice: 36000, status: "low", location: "Chiller B-01", supplier: "Farm Fresh Indonesia", weight: "1.5kg/karton", dimension: "35x25x10 cm", description: "Telur ayam segar 100% organik, tanpa tambahan bahan kimia. Langsung dari kandang ke meja Anda." },
 ];
 
 const statusConfig: Record<string, { label: string; class: string }> = {
@@ -23,30 +23,62 @@ const statusConfig: Record<string, { label: string; class: string }> = {
 export function EditStock() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const stockId = searchParams.get("id") || "STK-001";
+  const stockId = searchParams.get("id");
   
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   
-  // Find the stock data
-  const stockItem = stockData.find(item => item.id === stockId) || stockData[0];
-
   const [form, setForm] = useState({
-    name: stockItem.name,
-    sku: stockItem.sku,
-    category: stockItem.category,
-    brand: stockItem.brand,
-    quantity: stockItem.stock.toString(),
-    minStock: stockItem.minStock.toString(),
-    price: stockItem.price.toString(),
-    buyPrice: stockItem.buyPrice.toString(),
-    location: stockItem.location,
-    supplier: stockItem.supplier,
-    description: stockItem.description,
-    weight: stockItem.weight,
-    dimension: stockItem.dimension,
+    name: "",
+    sku: "",
+    category: "",
+    brand: "",
+    quantity: "",
+    minStock: "",
+    price: "",
+    buyPrice: "",
+    location: "",
+    supplier: "",
+    description: "",
+    weight: "",
+    dimension: "",
   });
+
+  // Inside EditStock component
+  const [stocks, setStocks] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Load the full list from localStorage
+    const savedData = localStorage.getItem("stock_db");
+    if (savedData) {
+      const parsedData = JSON.parse(savedData);
+      setStocks(parsedData);
+      
+      // Find the specific item to populate the form
+      const item = parsedData.find((s: any) => s.id === stockId);
+      if (item) {
+        setForm({
+          name: item.name,
+          sku: item.sku,
+          category: item.category,
+          brand: item.brand || "",
+          quantity: item.stock.toString(),
+          minStock: item.min.toString(),
+          price: item.price.toString(),
+          buyPrice: item.buyPrice.toString(),
+          location: item.location || "",
+          supplier: item.supplier || "",
+          description: item.description || "",
+          weight: item.weight || "",
+          dimension: item.dimension || "",
+        });
+      }
+    }
+  }, [stockId]);
+  
+  // Find the stock data
+  const stockItem = stocks.find(item => item.id === stockId);
 
   // Determine status based on stock quantity
   const getStatus = (qty: number, min: number) => {
@@ -66,7 +98,7 @@ export function EditStock() {
     if (!form.quantity) newErrors.quantity = "Jumlah stok tidak boleh kosong";
     if (parseInt(form.quantity) < 0) newErrors.quantity = "Jumlah stok tidak boleh negatif";
     if (!form.minStock) newErrors.minStock = "Stok minimum harus diisi";
-    if (parseInt(form.minStock) < 0) newErrors.minStock = "Stok minimum tidak boleh negatif";
+    if (parseInt(form.minStock) < 0) newErrors.min = "Stok minimum tidak boleh negatif";
     if (!form.price) newErrors.price = "Harga jual tidak boleh kosong";
     if (parseInt(form.price) < 0) newErrors.price = "Harga jual tidak boleh negatif";
     if (!form.buyPrice) newErrors.buyPrice = "Harga beli tidak boleh kosong";
@@ -78,23 +110,36 @@ export function EditStock() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setLoading(true);
 
-    // Simulate API call
+    // 1. Get current DB
+    const existingData = JSON.parse(localStorage.getItem("stock_db") || "[]");
+
+    // 2. Map and Update the specific ID
+    const updatedData = existingData.map((item: any) => {
+      if (item.id === stockId) {
+        return {
+          ...item,
+          ...form,
+          stock: parseInt(form.quantity),
+          updated: new Date().toLocaleDateString('id-ID'),
+          status: parseInt(form.quantity) === 0 ? "empty" : 
+                  parseInt(form.quantity) < parseInt(form.minStock) ? "low" : "available"
+        };
+      }
+      return item;
+    });
+
+    // 3. Save back to "JSON"
+    localStorage.setItem("stock_db", JSON.stringify(updatedData));
+
     setTimeout(() => {
       setLoading(false);
       setSuccess(true);
-
-      // Reset form after success
-      setTimeout(() => {
-        navigate("/stock/table");
-      }, 2000);
-    }, 1500);
+      setTimeout(() => navigate("/stock/table"), 1500);
+    }, 1000);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

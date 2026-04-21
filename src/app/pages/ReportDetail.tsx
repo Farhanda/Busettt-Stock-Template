@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import {
   ArrowLeft, Download, FileText, TrendingUp, ShoppingCart,
   Package, Calendar, User, Printer, Share2, CheckCircle,
@@ -57,6 +57,17 @@ export function ReportDetail() {
   };
 
   const formatRp = (v: number) => `Rp ${(v / 1000000).toFixed(1)}M`;
+
+  const [searchParams] = useSearchParams();
+  const productId = searchParams.get("id");
+  // const [product, setProduct] = useState<any>(null);
+  if (!productId) {
+    return (
+      <div className="flex items-center justify-center min-h-[100%] text-center">
+        <p className="text-gray-500">Memuat data Laporan...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-5">
@@ -131,7 +142,7 @@ export function ReportDetail() {
 
       {/* Tabs */}
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-        <div className="flex border-b border-gray-100 overflow-x-auto">
+        <div className="flex border-b border-gray-100 custom-scrollbar overflow-x-auto">
           {[
             { key: "summary", label: "Ringkasan" },
             { key: "weekly", label: "Mingguan" },
@@ -217,7 +228,7 @@ export function ReportDetail() {
           {activeTab === "products" && (
             <div>
               <h3 className="text-gray-900 mb-4">Top Produk Terjual</h3>
-              <div className="overflow-x-auto">
+              <div className="custom-scrollbar overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-100">

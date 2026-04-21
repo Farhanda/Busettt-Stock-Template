@@ -219,7 +219,7 @@ export function CardDetailModal({ isOpen, title, onClose }: CardDetailModalProps
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[85vh] custom-scrollbar overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center gap-2">
             {content?.icon}

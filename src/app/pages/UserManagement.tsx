@@ -127,7 +127,7 @@ export function UserManagement() {
 
       {/* Users Table */}
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="custom-scrollbar overflow-x-auto">
           <table className="w-full">
             <thead style={{ background: "#F8FAFF" }}>
               <tr>

@@ -1,0 +1,30 @@
+{
+  "monthlyHistory": [
+    { "month": "Jan", "masuk": 580, "keluar": 320, "saldo": 2100 },
+    { "month": "Feb", "masuk": 420, "keluar": 380, "saldo": 2140 },
+    { "month": "Mar", "masuk": 750, "keluar": 410, "saldo": 2480 },
+    { "month": "Apr", "masuk": 380, "keluar": 290, "saldo": 2570 },
+    { "month": "Mei", "masuk": 620, "keluar": 450, "saldo": 2740 },
+    { "month": "Jun", "masuk": 490, "keluar": 520, "saldo": 2710 },
+    { "month": "Jul", "masuk": 830, "keluar": 480, "saldo": 3060 },
+    { "month": "Agu", "masuk": 560, "keluar": 390, "saldo": 3230 },
+    { "month": "Sep", "masuk": 470, "keluar": 440, "saldo": 3260 },
+    { "month": "Okt", "masuk": 690, "keluar": 510, "saldo": 3440 },
+    { "month": "Nov", "masuk": 720, "keluar": 580, "saldo": 3580 },
+    { "month": "Des", "masuk": 850, "keluar": 640, "saldo": 3790 }
+  ],
+  "topMoving": [
+    { "name": "Ayam Broiler Siap Potong", "keluar": 180, "category": "Ayam Potong" },
+    { "name": "Ayam Kampung Premium", "keluar": 165, "category": "Ayam Hidup" },
+    { "name": "Telur Ayam Segar", "keluar": 142, "category": "Telur" },
+    { "name": "Daging Ayam Fillet", "keluar": 128, "category": "Hasil Olahan" },
+    { "name": "Ayam Jawa Super", "keluar": 115, "category": "Ayam Hidup" },
+    { "name": "Ayam Goreng Siap Jual", "keluar": 98, "category": "Hasil Olahan" }
+  ],
+  "weeklyHistory": [
+    { "week": "Week 1", "masuk": 150, "keluar": 80 },
+    { "week": "Week 2", "masuk": 200, "keluar": 120 },
+    { "week": "Week 3", "masuk": 180, "keluar": 100 },
+    { "week": "Week 4", "masuk": 220, "keluar": 150 }
+  ]
+}

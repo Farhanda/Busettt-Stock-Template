@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useState, useEffect, useMemo } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import {
   ArrowLeft, Package, TrendingUp, TrendingDown, Edit2, AlertTriangle,
   BarChart2, History, Tag, Box, Calendar, User, CheckCircle
@@ -8,79 +8,163 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine
 } from "recharts";
 
-const stockHistory = [
-  { date: "01 Apr", in: 100, out: 25, balance: 108 },
-  { date: "03 Apr", in: 0, out: 18, balance: 90 },
-  { date: "05 Apr", in: 150, out: 32, balance: 208 },
-  { date: "08 Apr", in: 0, out: 40, balance: 168 },
-  { date: "10 Apr", in: 0, out: 28, balance: 140 },
-  { date: "12 Apr", in: 0, out: 30, balance: 110 },
-  { date: "14 Apr", in: 0, out: 24, balance: 86 },
-  { date: "16 Apr", in: 0, out: 20, balance: 66 },
-  { date: "18 Apr", in: 0, out: 16, balance: 150 },
-];
-
-const activityLog = [
-  { id: 1, type: "in", qty: 150, user: "Budi Santoso", date: "18 Apr 2026, 06:30", note: "Pengiriman ayam dari PT. Peternakan Maju" },
-  { id: 2, type: "out", qty: 40, user: "Sistem (POS)", date: "16 Apr 2026, 14:20", note: "Penjualan ke Toko Ayam Bagus" },
-  { id: 3, type: "out", qty: 28, user: "Sistem (POS)", date: "14 Apr 2026, 09:15", note: "Penjualan ke Pedagang Pasar Induk" },
-  { id: 4, type: "out", qty: 30, user: "Dewi Rahayu", date: "12 Apr 2026, 15:45", note: "Pesanan khusus Restoran Ayam Goreng" },
-  { id: 5, type: "out", qty: 32, user: "Sistem (POS)", date: "08 Apr 2026, 10:30", note: "Penjualan retail mingguan" },
-  { id: 6, type: "in", qty: 100, user: "Bambang Irawan", date: "01 Apr 2026, 07:00", note: "Pengiriman dari kandang backup" },
-];
+// Import your JSON data as fallbacks
+import initialMovement from "../assets/data/stock_movement.json";
+import initialInventoryData from "../assets/data/stock_data.json";
+import analyticsData from "../assets/data/stock_analytics.json";
+import { calculateProductSummary, calculateSingleProductAnalytics, calculateStockAnalytics } from "../assets/utils/stock_analytics";
 
 export function StockDetail() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
+  const [searchParams] = useSearchParams();
+  const productId = searchParams.get("id"); // Get ID from URL e.g. ?id=STK-001
 
-  const product = {
-    id: "STK-001",
-    name: "Ayam Broiler Siap Potong (per ekor)",
-    sku: "AYM-BRL-SP-1",
-    category: "Ayam Potong",
-    brand: "Ayam Lokal Premium",
-    stock: 150,
-    minStock: 50,
-    price: 35000,
-    buyPrice: 28000,
-    status: "available",
-    location: "Kandang A-01",
-    supplier: "PT. Peternakan Maju",
-    lastRestock: "18 Apr 2026",
-    description: "Ayam broiler berkualitas tinggi, siap untuk dijual potong. Berusia 5 minggu, berat ideal 1.8-2kg per ekor. Dipelihara dengan standar kesehatan internasional dan pakan berkualitas premium untuk hasil daging yang optimal.",
-    weight: "1.8kg",
-    dimension: "30 x 25 x 20 cm",
+  // Flow State: Managing dynamic data
+  const [product, setProduct] = useState<any>(null);
+  const [history] = useState(analyticsData.monthlyHistory); // Using global history for the demo
+  
+  // 1. Get movements from LocalStorage (or props/state management)
+  const movements = JSON.parse(localStorage.getItem("movements_db") || JSON.stringify(initialMovement));
+  
+  // 2. Calculate analytics specifically for THIS product
+  const productAnalytics = useMemo(() => {
+    return calculateSingleProductAnalytics(movements, productId || "");
+  }, [movements, productId]);
+
+  useEffect(() => {
+    // const savedMovements = localStorage.getItem("movements_db");
+    if (!savedMovements) {
+      localStorage.setItem("movements_db", JSON.stringify(initialMovement));
+    }
+  }, []);
+
+  // 2. Ambil data pergerakan asli dari LocalStorage
+  const savedMovements = JSON.parse(localStorage.getItem("movements_db") || movements);
+  const savedProducts = JSON.parse(localStorage.getItem("stock_db") || "[]");
+
+  // 3. Hitung analytics secara dinamis
+  const analytics = useMemo(() => {
+    // Filter movements khusus untuk produk ini saja sebelum dihitung
+    const specificMovements = savedMovements.filter((m: any) => m.productId === productId);
+    return calculateStockAnalytics(specificMovements, savedProducts);
+  }, [productId, savedMovements]);
+
+  // 4. Gunakan hasil kalkulasi untuk Chart
+  const chartData = analytics.monthlyHistory;
+
+  // Filter riwayat khusus untuk produk ini & urutkan dari yang terbaru (descending)
+  const productHistory = useMemo(() => {
+    return movements
+      .filter((m: any) => m.productId === productId)
+      .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }, [movements, productId]);
+
+  useEffect(() => {
+    // FLOW STEP 1: Fetch the specific product from LocalStorage or JSON
+    const savedStocks = localStorage.getItem("stock_db");
+    const currentStocks = savedStocks ? JSON.parse(savedStocks) : initialInventoryData;
+    
+    const foundProduct = currentStocks.find((p: any) => p.id === productId);
+    
+    if (foundProduct) {
+      // Add missing fields for detail view if they don't exist in the simple JSON
+      setProduct({
+        ...foundProduct,
+        brand: foundProduct.brand || "Generik",
+        buyPrice: foundProduct.buyPrice || foundProduct.price * 0.8,
+        location: foundProduct.location || "Gudang Utama",
+        supplier: foundProduct.supplier || "Supplier Lokal",
+        lastRestock: foundProduct.updated,
+        description: foundProduct.description || "Tidak ada deskripsi tersedia.",
+      });
+    }
+    console.log("Produk yang ditemukan:", foundProduct); // Debugging output
+  }, [productId]);
+
+  // Di dalam komponen StockDetail
+  const summary = useMemo(() => {
+    return calculateProductSummary(movements, productId || "", product?.stock || 0);
+  }, [productId, product?.stock, movements]);
+
+  if (!product) {
+    return (
+      <div className="flex items-center justify-center min-h-[100%] text-center">
+        <p className="text-gray-500">Memuat data produk...</p>
+      </div>
+    );
+  }
+
+  // FLOW STEP 2: Logic for dynamic UI elements
+  const statusConfig: any = {
+    available: { label: "Tersedia", color: "text-green-600", bg: "bg-green-50", icon: <CheckCircle size={14} /> },
+    low: { label: "Menipis", color: "text-amber-600", bg: "bg-amber-50", icon: <AlertTriangle size={14} /> },
+    empty: { label: "Habis", color: "text-red-600", bg: "bg-red-50", icon: <Package size={14} /> },
   };
 
+  const currentStatus = statusConfig[product.status] || statusConfig.available;
+
   const statsCards = [
-    { label: "Stok Saat Ini", value: `${product.stock} ekor`, icon: <Box size={18} className="text-blue-600" />, bg: "bg-blue-50" },
-    { label: "Rata-rata Terjual/Hari", value: "~22 ekor", icon: <TrendingDown size={18} className="text-red-500" />, bg: "bg-red-50" },
-    { label: "Estimasi Habis", value: "~7 hari", icon: <Calendar size={18} className="text-orange-500" />, bg: "bg-orange-50" },
-    { label: "Total Terjual (Bulan Ini)", value: "450 ekor", icon: <TrendingUp size={18} className="text-green-600" />, bg: "bg-green-50" },
+    { 
+      label: "Stok Saat Ini", 
+      value: `${product.stock} unit`, 
+      icon: <Box size={18} className="text-blue-600" />, 
+      bg: "bg-blue-50" 
+    },
+    { 
+      label: "Rata-rata Keluar/Hari", 
+      value: `~${summary.avgPerDay} unit`, 
+      icon: <TrendingDown size={18} className="text-red-500" />, 
+      bg: "bg-red-50" 
+    },
+    { 
+      label: "Estimasi Habis", 
+      value: summary.estimation > 0 ? `~${summary.estimation} hari` : "N/A", 
+      icon: <Calendar size={18} className="text-orange-500" />, 
+      bg: "bg-orange-50" 
+    },
+    { 
+      label: "Total Keluar (Bulan Ini)", 
+      value: `${summary.currentMonthOut} unit`, 
+      icon: <TrendingUp size={18} className="text-green-600" />, 
+      bg: "bg-green-50" 
+    },
   ];
 
   return (
     <div className="p-6 space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <button
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <button 
             onClick={() => navigate("/stock/table")}
-            className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-500 transition-colors"
+            className="p-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition-colors text-gray-600"
           >
             <ArrowLeft size={16} />
           </button>
           <div>
-            <h1 className="text-gray-900">Detail Stock</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Informasi lengkap stok produk</p>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold text-gray-900">{product.name}</h1>
+              <span className={`px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 ${currentStatus.bg} ${currentStatus.color}`}>
+                {currentStatus.icon}
+                {currentStatus.label}
+              </span>
+            </div>
+            <p className="text-gray-500 flex items-center gap-2 mt-1">
+              <span className="font-medium text-gray-700">{product.sku}</span>
+              <span>•</span>
+              <span>{product.category}</span>
+            </p>
           </div>
         </div>
+        
         <button 
           onClick={() => navigate(`/stock/edit?id=${product.id}`)}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm hover:opacity-90 transition-colors" 
-          style={{ background: "#1E3A8A" }}>
+          className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-white font-medium transition-all shadow-lg hover:shadow-blue-200/50"
+          style={{ background: "#1E3A8A" }}
+        >
           <Edit2 size={14} />
-          <span>Edit Produk</span>
+          Edit Produk
         </button>
       </div>
 
@@ -169,15 +253,15 @@ export function StockDetail() {
             <div>
               <h3 className="text-gray-800 mb-4">Pergerakan Stok (18 Hari Terakhir)</h3>
               <ResponsiveContainer width="100%" height={250}>
-                <LineChart data={stockHistory}>
+                <LineChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                   <XAxis dataKey="date" tick={{ fontSize: 12, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
                   <Tooltip />
                   <ReferenceLine y={product.minStock} stroke="#f59e0b" strokeDasharray="4 3" label={{ value: "Min. Stok", fontSize: 11, fill: "#f59e0b" }} />
-                  <Line type="monotone" dataKey="balance" name="Saldo Stok" stroke="#1E3A8A" strokeWidth={2.5} dot={{ r: 4, fill: "#1E3A8A" }} />
-                  <Line type="monotone" dataKey="in" name="Masuk" stroke="#22c55e" strokeWidth={2} dot={false} strokeDasharray="4 3" />
-                  <Line type="monotone" dataKey="out" name="Keluar" stroke="#ef4444" strokeWidth={2} dot={false} strokeDasharray="4 3" />
+                  <Line type="monotone" dataKey="saldo" name="Saldo Stok" stroke="#1E3A8A" strokeWidth={2.5} dot={{ r: 4, fill: "#1E3A8A" }} />
+                  <Line type="monotone" dataKey="masuk" name="Masuk" stroke="#22c55e" strokeWidth={2} dot={false} strokeDasharray="4 3" />
+                  <Line type="monotone" dataKey="keluar" name="Keluar" stroke="#ef4444" strokeWidth={2} dot={false} strokeDasharray="4 3" />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -187,7 +271,7 @@ export function StockDetail() {
             <div>
               <h3 className="text-gray-800 mb-4">Log Aktivitas Stok</h3>
               <div className="space-y-3">
-                {activityLog.map((log) => (
+                {productHistory.map((log: any) => (
                   <div key={log.id} className="flex items-start gap-3 p-3 rounded-lg bg-gray-50">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${log.type === "in" ? "bg-green-100" : "bg-red-100"}`}>
                       {log.type === "in" ? <TrendingUp size={14} className="text-green-600" /> : <TrendingDown size={14} className="text-red-500" />}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
@@ -8,6 +8,10 @@ import {
   ArrowUpRight, ArrowDownRight, Users, ChevronRight, RefreshCcw
 } from "lucide-react";
 import { CardDetailModal } from "../components/CardDetailModal";
+
+import { calculateStockAnalytics, calculateCategoryStock, calculateCategoryStockAnalytics, calculateCategoryStockStatus } from "../assets/utils/stock_analytics";
+import initialInventoryData from "../assets/data/stock_data.json";
+import initialMovement from "../assets/data/stock_movement.json";
 
 const salesData = [
   { month: "Jan", penjualan: 42000000, target: 40000000 },
@@ -67,18 +71,69 @@ const statusLabels: Record<string, string> = {
 export function Dashboard() {
   const navigate = useNavigate();
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  const summaryCards = [
+  const handleRefresh = () => {
+    setRefreshKey(prev => prev + 1); // Setiap klik, nilai berubah
+  };
+
+  // Ambil data dari LocalStorage atau gunakan JSON sebagai fallback awal
+  useEffect(() => {
+    const savedMovements = localStorage.getItem("movements_db");
+    const savedProducts = localStorage.getItem("stock_db");
+    if (!savedMovements) {
+      localStorage.setItem("movements_db", JSON.stringify(initialMovement));
+    }
+    if (!savedProducts) {
+      localStorage.setItem("stock_db", JSON.stringify(initialInventoryData));
+    }
+  }, []);
+
+  const stocks = useMemo(() => {
+    const saved = localStorage.getItem("stock_db");
+    return saved ? JSON.parse(saved) : initialInventoryData;
+  }, [refreshKey]);
+
+  const movements = useMemo(() => {
+    const saved = localStorage.getItem("movements_db");
+    return saved ? JSON.parse(saved) : initialMovement;
+  }, [refreshKey]);
+
+  // Jalankan kalkulasi analytics secara menyeluruh
+  const analytics = useMemo(() => {
+    return calculateStockAnalytics(movements, stocks);
+  }, [movements, stocks, refreshKey]);
+
+  const categoryData = useMemo(() => calculateCategoryStock(stocks, movements), [stocks, movements]);
+    // Di dalam komponen Dashboard
+  const categoryStockData = useMemo(() => {
+    // Kita hanya ingin menampilkan kategori yang stoknya mendekati atau di bawah minimum
+    return calculateCategoryStockStatus(stocks).filter(cat => cat.stock <= cat.min); 
+  }, [stocks, refreshKey]);
+
+  // Debugging output untuk memastikan data kategori sudah benar
+  // useEffect(() => {
+  //   console.log("Analytics Data:", categoryStockData);// Debugging output untuk memastikan data kategori sudah benar
+  // }, [categoryStockData]);
+  
+  // Data Statistik Ringkas
+  const stats = [
     {
       title: "Total Stok",
-      value: "2,450",
-      unit: "unit",
-      change: "+12.5%",
-      positive: true,
-      icon: <Package size={22} className="text-blue-600" />,
-      bg: "bg-blue-50",
-      border: "border-blue-100",
+      value: stocks.reduce((acc: number, curr: any) => acc + curr.stock, 0).toLocaleString(),
+      change: "+12%",
+      isPositive: true,
+      icon: <Package className="text-blue-600" />,
+      bg: "bg-blue-50"
     },
+    // {
+    //   title: "Barang Keluar",
+    //   value: analytics.monthlyHistory.reduce((acc, curr) => acc + curr.keluar, 0).toLocaleString(),
+    //   change: "+18%",
+    //   isPositive: true,
+    //   icon: <ShoppingCart className="text-indigo-600" />,
+    //   bg: "bg-indigo-50"
+    // },
     {
       title: "Total Penjualan",
       value: "Rp 780M",
@@ -101,15 +156,21 @@ export function Dashboard() {
     },
     {
       title: "Stok Menipis",
-      value: "14",
-      unit: "produk",
-      change: "+3 produk",
-      positive: false,
-      icon: <AlertTriangle size={22} className="text-orange-600" />,
-      bg: "bg-orange-50",
-      border: "border-orange-100",
-    },
+      value: stocks.filter((p: any) => p.status === 'low').length,
+      change: "Perlu Re-stock",
+      isPositive: false,
+      icon: <AlertTriangle className="text-amber-600" />,
+      bg: "bg-amber-50"
+    }
   ];
+
+  const today = new Date();
+  const formattedDate = new Intl.DateTimeFormat('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  }).format(today);
 
   return (
     <div className="p-6 space-y-6">
@@ -117,7 +178,7 @@ export function Dashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-gray-900">Dashboard</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Sabtu, 18 April 2026 — Selamat datang, Admin!</p>
+          <p className="text-sm text-gray-500 mt-0.5">{formattedDate} — Selamat datang, Admin!</p>
         </div>
         <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
           <RefreshCcw size={14} />
@@ -127,7 +188,7 @@ export function Dashboard() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-        {summaryCards.map((card) => (
+        {stats.map((card) => (
           <div
             key={card.title}
             onClick={() => setSelectedCard(card.title)}
@@ -197,7 +258,7 @@ export function Dashboard() {
             </div>
           </div>
           <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={stockData} layout="vertical" barSize={10}>
+            <BarChart data={categoryData} layout="vertical" barSize={10}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" horizontal={false} />
               <XAxis type="number" tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
               <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: "#6b7280" }} axisLine={false} tickLine={false} width={65} />
@@ -226,7 +287,7 @@ export function Dashboard() {
               Lihat Semua <ChevronRight size={14} />
             </button>
           </div>
-          <div className="overflow-x-auto">
+          <div className="custom-scrollbar overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100">
@@ -273,7 +334,7 @@ export function Dashboard() {
               </div>
             </div>
             <div className="space-y-3">
-              {lowStockItems.map((item) => (
+              {categoryStockData.map((item) => (
                 <div key={item.name} className="flex items-center justify-between">
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium text-gray-700 truncate">{item.name}</p>
@@ -304,9 +365,29 @@ export function Dashboard() {
             <h4 className="text-sm font-semibold text-gray-900 mb-4">Statistik Cepat</h4>
             <div className="space-y-3">
               {[
-                { label: "Total Pengguna", value: "24 orang", icon: <Users size={14} className="text-blue-500" /> },
-                { label: "Produk Aktif", value: "1,847 item", icon: <Package size={14} className="text-violet-500" /> },
-                { label: "Revenue Hari Ini", value: "Rp 12.4M", icon: <TrendingUp size={14} className="text-green-500" /> },
+                { 
+                  label: "Total Pengguna", 
+                  value: "24 orang", // Tetap statis jika belum ada sistem user
+                  icon: <Users size={14} className="text-blue-500" /> 
+                },
+                { 
+                  label: "Produk Aktif", 
+                  // MENGGUNAKAN DATA DINAMIS:
+                  value: `${stocks.length} item`, 
+                  icon: <Package size={14} className="text-violet-500" /> 
+                },
+                { 
+                  label: "Revenue Hari Ini", 
+                  value: "Rp 12.4M", // Bisa diganti logic total (qty * harga) jika perlu
+                  icon: <TrendingUp size={14} className="text-green-500" /> 
+                },
+                { 
+                  label: "Transaksi Hari Ini", 
+                  value: `${movements.filter((m: any) => 
+                    new Date(m.date).toDateString() === new Date().toDateString()
+                  ).length} kali`, 
+                  icon: <RefreshCcw size={14} className="text-blue-500" /> 
+                }
               ].map((s) => (
                 <div key={s.label} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
                   <div className="flex items-center gap-2">

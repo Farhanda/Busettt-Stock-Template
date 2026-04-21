@@ -37,8 +37,8 @@ export function AddStock() {
     if (!form.category) newErrors.category = "Kategori harus dipilih";
     if (!form.quantity) newErrors.quantity = "Jumlah stok tidak boleh kosong";
     if (parseInt(form.quantity) < 0) newErrors.quantity = "Jumlah stok tidak boleh negatif";
-    if (!form.minStock) newErrors.minStock = "Stok minimum harus diisi";
-    if (parseInt(form.minStock) < 0) newErrors.minStock = "Stok minimum tidak boleh negatif";
+    if (!form.minStock) newErrors.min = "Stok minimum harus diisi";
+    if (parseInt(form.minStock) < 0) newErrors.min = "Stok minimum tidak boleh negatif";
     if (!form.price) newErrors.price = "Harga jual tidak boleh kosong";
     if (parseInt(form.price) < 0) newErrors.price = "Harga jual tidak boleh negatif";
     if (!form.buyPrice) newErrors.buyPrice = "Harga beli tidak boleh kosong";
@@ -50,23 +50,29 @@ export function AddStock() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setLoading(true);
 
-    // Simulate API call
+    // 1. Prepare the new object
+    const newStockItem = {
+      ...form,
+      id: `STK-0${Math.floor(Math.random() * 1000)}`, // Generate demo ID
+      stock: parseInt(form.quantity),
+      updated: new Date().toLocaleDateString('id-ID'),
+      status: parseInt(form.quantity) <= parseInt(form.minStock) ? "low" : "available"
+    };
+
+    // 2. "Write" to LocalStorage (Demo Database)
+    const existingData = JSON.parse(localStorage.getItem("stock_db") || "[]");
+    const updatedData = [newStockItem, ...existingData];
+    localStorage.setItem("stock_db", JSON.stringify(updatedData));
+
     setTimeout(() => {
       setLoading(false);
       setSuccess(true);
-
-      // Reset form after success
-      setTimeout(() => {
-        navigate("/stock/table");
-      }, 2000);
-    }, 1500);
+      setTimeout(() => navigate("/stock/table"), 1500);
+    }, 1000);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
