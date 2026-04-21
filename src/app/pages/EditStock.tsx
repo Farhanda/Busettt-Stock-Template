@@ -64,7 +64,7 @@ export function EditStock() {
           category: item.category,
           brand: item.brand || "",
           quantity: item.stock.toString(),
-          minStock: item.min.toString(),
+          minStock: item.minStock.toString(),
           price: item.price.toString(),
           buyPrice: item.buyPrice.toString(),
           location: item.location || "",
@@ -98,7 +98,7 @@ export function EditStock() {
     if (!form.quantity) newErrors.quantity = "Jumlah stok tidak boleh kosong";
     if (parseInt(form.quantity) < 0) newErrors.quantity = "Jumlah stok tidak boleh negatif";
     if (!form.minStock) newErrors.minStock = "Stok minimum harus diisi";
-    if (parseInt(form.minStock) < 0) newErrors.min = "Stok minimum tidak boleh negatif";
+    if (parseInt(form.minStock) < 0) newErrors.minStock = "Stok minimum tidak boleh negatif";
     if (!form.price) newErrors.price = "Harga jual tidak boleh kosong";
     if (parseInt(form.price) < 0) newErrors.price = "Harga jual tidak boleh negatif";
     if (!form.buyPrice) newErrors.buyPrice = "Harga beli tidak boleh kosong";
